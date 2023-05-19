@@ -8,7 +8,7 @@ jobs:
     ci:
       runs-on: ubuntu-latest
       steps:
-        - uses: ./lint.ts.yml
+        - uses: TogetherCrew/operations/.github/workflows/lint.ts.yml@main
         - uses: ./build.yml
         - uses: ./test.yml
         - uses: ./push.yml
