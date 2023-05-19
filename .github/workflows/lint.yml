@@ -1,8 +1,5 @@
 on:
   workflow_call:
-    secrets:
-      GITHUB_TOKEN:
-        required: true
   
 jobs:
   lint:
@@ -11,3 +8,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: github/super-linter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
