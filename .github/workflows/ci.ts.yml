@@ -5,10 +5,11 @@ on:
         required: true
 
 jobs:
-    ci:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: TogetherCrew/operations/.github/workflows/lint.ts.yml@main
-        - uses: ./build.yml
-        - uses: ./test.yml
-        - uses: ./push.yml
+    lint:
+      uses: ./lint.yml
+    build:
+      uses: ./build.yml
+    test:
+      uses: ./test.yml
+    push:
+      uses: ./push.yml
