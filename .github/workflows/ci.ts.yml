@@ -6,10 +6,10 @@ on:
 
 jobs:
     lint:
-      uses: ./lint.yml
+      uses: ./.github/workflows/lint.yml
     build:
-      uses: ./build.yml
+      uses: ./.github/workflows/build.yml@latest
     test:
-      uses: ./test.yml
+      uses: ./.github/workflows/test.yml@latest
     push:
-      uses: ./push.yml
+      uses: ./.github/workflows/push.yml@latest
