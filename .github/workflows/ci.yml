@@ -13,6 +13,8 @@ jobs:
     test:
       needs: build
       uses: ./.github/workflows/test.yml
+      secrets:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     push:
       needs: test
       uses: ./.github/workflows/push.yml
