@@ -6,7 +6,7 @@ on:
 
 jobs:
     ci:
-      runs-on: ubuntu
+      runs-on: ubuntu-latest
       steps:
         - uses: ./lint.ts.yml
         - uses: ./build.yml
