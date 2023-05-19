@@ -1,0 +1,14 @@
+on: 
+  workflow_call:
+    secrets:
+      CC_TEST_REPORTER_ID:
+        required: true
+
+jobs:
+    ci:
+      runs-on: ubuntu
+      steps:
+        - uses: ./lint.ts.yml
+        - uses: ./build.yml
+        - uses: ./test.yml
+        - uses: ./push.yml
