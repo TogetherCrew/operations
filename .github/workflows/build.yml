@@ -1,5 +1,3 @@
-name: Build
-
 on: 
   workflow_call:
   
@@ -8,7 +6,8 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   
 jobs:
-  build-image:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     
     steps:
