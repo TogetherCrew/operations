@@ -8,8 +8,11 @@ jobs:
     lint:
       uses: ./.github/workflows/lint.yml
     build:
+      needs: lint
       uses: ./.github/workflows/build.yml
     test:
+      needs: build
       uses: ./.github/workflows/test.yml
     push:
+      needs: test
       uses: ./.github/workflows/push.yml
