@@ -7,14 +7,11 @@ on:
 jobs:
     lint:
       uses: ./.github/workflows/lint.yml
-    build:
-      needs: lint
-      uses: ./.github/workflows/build.yml
     test:
-      needs: build
+      needs: lint
       uses: ./.github/workflows/test.yml
       secrets:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-    push:
+    build-push:
       needs: test
-      uses: ./.github/workflows/push.yml
+      uses: ./.github/workflows/build-push.yml

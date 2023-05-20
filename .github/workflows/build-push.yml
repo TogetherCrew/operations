@@ -6,8 +6,8 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   
 jobs:
-  build:
-    name: Build
+  build-push:
+    name: Build + Push Image
     runs-on: ubuntu-latest
     
     steps:
@@ -20,11 +20,6 @@ jobs:
       - uses: docker/build-push-action@v4
         with:
           context: .
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=/tmp/image.tar
-      - uses: actions/upload-artifact@v3
-        with:
-          name: image
-          path: /tmp/image.tar
