@@ -8,10 +8,9 @@ jobs:
     lint:
       uses: ./.github/workflows/lint.yml
     test:
-      needs: lint
       uses: ./.github/workflows/test.yml
       secrets:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     build-push:
-      needs: test
+      needs: [lint, test]
       uses: ./.github/workflows/build-push.yml
