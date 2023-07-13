@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  grafana:
+  prometheus:
+  cadvisor:
+  redis-cadvisor:
+  loki:
+  promtail:
+  node-exporter:
+
+volumes:
+  - grafana_volume
+  - prometheus_volume
+  - loki_volume
+
+networks:
+  monitoring:
+    driver: bridge

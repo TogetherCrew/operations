@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  mongodb:
+  rabbitmq:
+  redis-discord-bot:
+  redis-discord-analyzer:
+  neo4j:
+  api:
+  discord-bot:
+  discord-analyzer-server:
+  discord-analyzer-worker:
