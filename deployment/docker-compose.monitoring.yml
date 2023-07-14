@@ -7,27 +7,29 @@ networks:
       config:
         - subnet: 172.22.22.0/16
 
-x-logging: &logging
+x-logging:
+  &logging
   logging:
-      driver: loki
-      options:
-        loki-url: http://172.22.22.15:3100/loki/api/v1/push
-        loki-retries: 5
-        loki-batch-size: 400
-        loki-external-labels: stack=monitoring
-        loki-relabel-config: |
-          - action: labelmap
-            regex: compose_service
-            replacement: service
-        loki-pipeline-stages: |
-          - labels:
-              service:
-              stack:
+    driver: loki
+    options:
+      loki-url: http://172.22.22.15:3100/loki/api/v1/push
+      loki-retries: 5
+      loki-batch-size: 400
+      loki-external-labels: stack=monitoring
+      loki-relabel-config: |
+        - action: labelmap
+          regex: compose_service
+          replacement: service
+      loki-pipeline-stages: |
+        - labels:
+            service:
+            stack:
 
 volumes:
   grafana_volume:
   prometheus_volume:
   loki_volume:
+
 
 services:
   grafana:
@@ -76,7 +78,7 @@ services:
     container_name: redis-cadvisor
     networks:
       - monitoring
-    
+
   loki:
     container_name: loki
     image: grafana/loki:2.8.0
