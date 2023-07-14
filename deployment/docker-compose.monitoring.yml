@@ -39,6 +39,7 @@ services:
     ports:
       - 4000:3000
     volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning
       - grafana_volume:/var/lib/grafana
     networks:
       - monitoring
@@ -66,7 +67,6 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
     depends_on:
       - redis-cadvisor
     networks:
