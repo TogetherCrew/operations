@@ -1,5 +1,7 @@
 version: '3'
 
+name: monitoring
+
 networks:
   monitoring:
     driver: bridge
@@ -15,15 +17,6 @@ x-logging:
       loki-url: http://172.22.22.15:3100/loki/api/v1/push
       loki-retries: 5
       loki-batch-size: 400
-      loki-external-labels: stack=monitoring
-      loki-relabel-config: |
-        - action: labelmap
-          regex: compose_service
-          replacement: service
-      loki-pipeline-stages: |
-        - labels:
-            service:
-            stack:
 
 volumes:
   grafana_volume:
