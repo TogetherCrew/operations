@@ -29,3 +29,9 @@ services:
       --agree-tos --no-eff-email
       --force-renewal
       -d ${SERVER_NAME}
+
+
+  web:
+    image: nginxdemos/nginx-hello
+    container_name: web
+    restart: always
