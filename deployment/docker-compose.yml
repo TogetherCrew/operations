@@ -13,13 +13,14 @@ services:
       - 443:443
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d/:ro
-      - ./certbot/www:/var/www/certbot/:ro
+      - certbot-etc:/etc/letsencrypt:ro
   
   certbot:
     image: certbot/dns-cloudflare
     container_name: certbot
     volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
+      - ./cloudflare.ini:/root/cloudflare.ini:ro
+      - certbot-etc:/etc/letsencrypt:rw
     command: >-
       certonly --dns-cloudflare
       --dns-cloudflare-credentials /root/cloudflare.ini
