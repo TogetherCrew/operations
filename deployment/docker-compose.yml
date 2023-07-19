@@ -1,5 +1,8 @@
 version: '3'
 
+volumes:
+  certbot-etc:
+
 services:
   nginx:
     image: nginx:1.25.1-alpine
@@ -8,14 +11,20 @@ services:
     ports:
       - 80:80
       - 443:443
-    env_file:
-      - .env.nginx
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d/:ro
       - ./certbot/www:/var/www/certbot/:ro
   
   certbot:
-    image: certbot/certbot:latest
+    image: certbot/dns-cloudflare
     container_name: certbot
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
+    command: >-
+      certbot --dns-cloudflare
+      --dns-cloudflare-credentials /root/cloudflare.ini
+      --dns-cloudflare-propagation-seconds 15
+      --email info@togethercrew.com
+      --agree-tos --no-eff-email
+      --force-renewal
+      -d ${SERVER_NAME}
