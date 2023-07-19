@@ -35,6 +35,6 @@ services:
       - nginx
 
   web:
-    image: nginxdemos/nginx-hello
+    image: yeasy/simple-web:latest
     container_name: web
     restart: always
