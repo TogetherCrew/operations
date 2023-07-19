@@ -12,7 +12,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./nginx/conf:/etc/nginx/conf.d/:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
       - certbot-etc:/etc/letsencrypt:ro
     depends_on:
       - web

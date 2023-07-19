@@ -1,0 +1,11 @@
+.env.*
+.env
+*.conf
+!*.conf.sample
+!.env.sample
+!.env.*.sample
+
+**/.env
+*.DS_Store
+
+cloudflare.ini
