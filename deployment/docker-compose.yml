@@ -14,6 +14,8 @@ services:
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d/:ro
       - certbot-etc:/etc/letsencrypt:ro
+    depends_on:
+      - web
   
   certbot:
     image: certbot/dns-cloudflare
@@ -29,7 +31,8 @@ services:
       --agree-tos --no-eff-email
       --force-renewal
       -d ${SERVER_NAME}
-
+    depends_on:
+      - nginx
 
   web:
     image: nginxdemos/nginx-hello
