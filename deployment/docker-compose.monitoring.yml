@@ -23,7 +23,6 @@ volumes:
   prometheus_volume:
   loki_volume:
 
-
 services:
   grafana:
     image: grafana/grafana
@@ -100,4 +99,12 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     networks:
       - monitoring
+    <<: *logging
+
+  docker-state-exporter:
+    image: karugaru/docker_state_exporter
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
     <<: *logging
