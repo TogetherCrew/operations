@@ -21,7 +21,7 @@ services:
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
     command: >-
-      certbot --dns-cloudflare
+      certonly --dns-cloudflare
       --dns-cloudflare-credentials /root/cloudflare.ini
       --dns-cloudflare-propagation-seconds 15
       --email info@togethercrew.com
