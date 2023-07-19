@@ -19,22 +19,22 @@ services:
     depends_on:
       - web
   
-  certbot:
-    image: certbot/dns-cloudflare
-    container_name: certbot
-    volumes:
-      - ./cloudflare.ini:/root/cloudflare.ini:ro
-      - certbot-etc:/etc/letsencrypt:rw
-    command: >-
-      certonly --dns-cloudflare
-      --dns-cloudflare-credentials /root/cloudflare.ini
-      --dns-cloudflare-propagation-seconds 15
-      --email info@togethercrew.com
-      --agree-tos --no-eff-email
-      --force-renewal
-      -d ${SERVER_NAME}
-    depends_on:
-      - nginx
+  # certbot:
+  #   image: certbot/dns-cloudflare
+  #   container_name: certbot
+  #   volumes:
+  #     - ./cloudflare.ini:/root/cloudflare.ini:ro
+  #     - certbot-etc:/etc/letsencrypt:rw
+  #   command: >-
+  #     certonly --dns-cloudflare
+  #     --dns-cloudflare-credentials /root/cloudflare.ini
+  #     --dns-cloudflare-propagation-seconds 15
+  #     --email info@togethercrew.com
+  #     --agree-tos --no-eff-email
+  #     --force-renewal
+  #     -d ${SERVER_NAME}
+  #   depends_on:
+  #     - nginx
 
   web:
     image: yeasy/simple-web:latest
