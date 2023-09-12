@@ -1,1 +1,4 @@
 .migrations.properties
+*.secret
+*.env
+letsencrypt/*

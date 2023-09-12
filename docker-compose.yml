@@ -1,0 +1,61 @@
+version: "3.3"
+
+name: togethercrew
+
+networks:
+  public:
+  private:
+
+secrets:
+  cf_dns_api_token:
+    file: ./secrets/cf_dns_api_token.secret
+
+services:
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # - --certificatesresolvers.myresolver.acme.dnschallenge=true
+      # - --certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare
+      # - --certificatesresolvers.myresolver.acme.email=postmaster@togethercrew.com
+      # - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      # - --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      # - --log.level=DEBUG
+      - --metrics.prometheus=true
+      - --providers.docker.watch=true
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    secrets:
+      - cf_dns_api_token
+    environment:
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
+    volumes:
+      - ./letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - public
+      - private
+    logging:
+      options:
+        max-size: 10m
+        max-file: 3
+    restart: unless-stopped
+
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami.rule=Host(`whoami.${HOST_NAME}`)
+      # - traefik.http.routers.whoami.entrypoints=websecure
+      # - traefik.http.routers.whoami.tls.certresolver=myresolver
+    networks:
+      - private
