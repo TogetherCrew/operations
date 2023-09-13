@@ -1,7 +1,7 @@
 .migrations.properties
-*.secret
 .env
 .env.*
-letsencrypt/*
+!.env.example
+!.env.*.example
 userFile
 certs/*.pem
