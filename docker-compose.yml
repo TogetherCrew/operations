@@ -32,19 +32,18 @@ services:
       - public
       - private
     env_file:
-      - .env.traefik
+      - .env
     # <<: *logging
 
-  # whoami:
-  #   image: traefik/whoami
-  #   container_name: whoami
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.whoami.rule=Host(`whoami.${HOST_NAME}`)
-  #     - traefik.http.routers.whoami.entrypoints=https
-  #     # - traefik.http.routers.whoami.tls.certresolver=myresolver
-  #   networks:
-  #     - private
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami.rule=Host(`whoami.${HOST_NAME}`)
+      - traefik.http.routers.whoami.tls=true
+    networks:
+      - private
 
 #   mongo:
 #     image: mongo:7.0.1

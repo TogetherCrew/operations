@@ -5,7 +5,7 @@ This repository houses a collection of code artifacts, including Github actions,
 
 ## Localhost
 
-- Create a `.env.traefik` file with `HOST_NAME=docker.localhost`. See [.env.traefik.example](/.env.traefik.example).
+- Create a `.env` file with `HOST_NAME=docker.localhost`. See [.env.example](/.env.example).
 - Generate a basic auth for a user using: `echo $(htpasswd -nB user)`
 - Create a `userFile` file and paste the basic auth you generated. See [userFile.example](/userFile.example).
 - Install [mkcert](https://github.com/FiloSottile/mkcert).
@@ -23,7 +23,7 @@ This repository houses a collection of code artifacts, including Github actions,
 - [Install Docker Engine with Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 - Clone the repository. `git clone https://github.com/TogetherCrew/operations`
 - Go into the folder: `cd operations`
-- Create a `.env.traefik` file with `HOST_NAME=yourdomain.com`. See [.env.traefik.example](/.env.traefik.example).
+- Create a `.env` file with `HOST_NAME=yourdomain.com`. See [.env.example](/.env.example).
 - Generate a basic auth for a user using: `echo $(htpasswd -nB user)`. See [userFile.example](/userFile.example).
 - Create a `userFile` file and paste the basic auth you generated. You can add multiple.
 - Go to Cloudflare -> Your Domain -> SSL/TLS -> Origin Server, and Create Certificates.
