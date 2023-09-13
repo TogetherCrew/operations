@@ -23,6 +23,7 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 27017:27017
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./config/traefik:/etc/traefik:ro
@@ -42,29 +43,28 @@ services:
       - traefik.enable=true
       - traefik.http.routers.whoami.rule=Host(`whoami.${HOST_NAME}`)
       - traefik.http.routers.whoami.tls=true
+      - traefik.http.routers.whoami.entrypoints=https
     networks:
       - private
 
-#   mongo:
-#     image: mongo:7.0.1
-#     container_name: mongo
-#     restart: unless-stopped
-#     env_file:
-#       - ./.env.mongo
-#     volumes:
-#       - mongo:/data/db
-#       - ./services/mongo/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
-#     networks:
-#       - private
-#     labels:
-#       - traefik.enable=true
-#       # - traefik.tcp.routers.mongo.rule=HostSNI(`${HOST_NAME}`)
-#       - traefik.tcp.routers.mongo.rule=HostSNI(`*`)
-#       - traefik.tcp.routers.mongo.service=mongo
-#       # - traefik.tcp.routers.mongo.entrypoints=mongo
-#       - traefik.tcp.services.mongo.loadbalancer.server.port=27001
-#       # - traefik.http.routers.mongo.tls.certresolver=myresolver
-#       # - traefik.http.routers.mongo.entrypoints=websecure
+  mongo:
+    image: mongo:7.0.1
+    container_name: mongo
+    restart: unless-stopped
+    env_file:
+      - ./.env.mongo
+    volumes:
+      - mongo:/data/db
+      - ./config/mongo/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+    networks:
+      - private
+    labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.mongo.rule=HostSNI(`*`)
+      - traefik.tcp.routers.mongo.entrypoints=mongo
+      - traefik.tcp.services.mongo.loadbalancer.server.port=27017
+      # - traefik.tcp.routers.mongo.tls=true
+
 
 volumes:
   mongo:

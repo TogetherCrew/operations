@@ -4,4 +4,4 @@
 !.env.example
 !.env.*.example
 userFile
-certs/*.pem
+certs/*
