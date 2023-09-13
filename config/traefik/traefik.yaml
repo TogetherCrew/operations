@@ -11,15 +11,9 @@ providers:
     watch: true
           
 entryPoints:
-  web:
-    address: :80
-    # http:
-    #   redirections:
-    #     entryPoint:
-    #       to: websecure
-    #       scheme: https
-    
-  websecure:
+  http:
+    address: :80    
+  https:
     address: :443
 
 metrics:

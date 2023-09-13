@@ -15,35 +15,9 @@ http:
       basicAuth:
         usersFile: ./userFile
 
-# {{ if (eq (env "ENVIRONMENT") "development") }}
-# Development
-
 tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /etc/certs/origin-cert.pem
-        keyFile: /etc/certs/origin-key.pem
-
-# {{ else }}
-# # Production
-
-# certificatesResolvers:
-#   cloudflare:
-#     acme:
-#       dnsChallenge: true
-#       provider: cloudflare
-#       email: postmaster@togethercrew.com
-#       storage: /letsencrypt/acme.json
-#       caserver: https://acme-staging-v02.api.letsencrypt.org/directory
-
-# tls:
-#   stores:
-#     default:
-#       defaultGeneratedCert:
-#         resolver: cloudflare
-#         domain:
-#           main: "{{ env "HOST_NAME" }}"
-#           sans: "*.{{ env "HOST_NAME" }}"
-
-# {{ end }}
+  certificates:
+    - certFile: /etc/certs/origin-cert.pem
+      keyFile: /etc/certs/origin-key.pem
+      stores:
+        - default

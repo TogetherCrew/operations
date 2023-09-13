@@ -6,10 +6,6 @@ networks:
   public:
   private:
 
-# secrets:
-#   cf_dns_api_token:
-#     file: ./secrets/cf_dns_api_token.secret
-
 x-logging:
   &logging
   logging:
@@ -27,15 +23,10 @@ services:
     ports:
       - 80:80
       - 443:443
-    # secrets:
-    #   - cf_dns_api_token
-    # environment:
-    #   - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./config/traefik:/etc/traefik:ro
-      - ./certs:/etc/certs:ro # Used in development
-      - letsencrypt:/letsencrypt
+      - ./certs:/etc/certs:ro
       - ./userFile:/userFile:ro
     networks:
       - public
@@ -78,4 +69,3 @@ services:
 
 volumes:
   mongo:
-  letsencrypt:
