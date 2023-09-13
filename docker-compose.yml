@@ -6,56 +6,76 @@ networks:
   public:
   private:
 
-secrets:
-  cf_dns_api_token:
-    file: ./secrets/cf_dns_api_token.secret
+# secrets:
+#   cf_dns_api_token:
+#     file: ./secrets/cf_dns_api_token.secret
+
+x-logging:
+  &logging
+  logging:
+    driver: "json-file"
+    options:
+      max-size: 10m
+      max-file: 3
 
 services:
 
   traefik:
     image: traefik:v2.10
     container_name: traefik
-    command:
-      - --api.insecure=true
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      # - --certificatesresolvers.myresolver.acme.dnschallenge=true
-      # - --certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare
-      # - --certificatesresolvers.myresolver.acme.email=postmaster@togethercrew.com
-      # - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-      # - --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
-      # - --log.level=DEBUG
-      - --metrics.prometheus=true
-      - --providers.docker.watch=true
+    restart: unless-stopped
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
-    secrets:
-      - cf_dns_api_token
-    environment:
-      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
+    # secrets:
+    #   - cf_dns_api_token
+    # environment:
+    #   - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
     volumes:
-      - ./letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/traefik:/etc/traefik:ro
+      - ./certs:/etc/certs:ro # Used in development
+      - letsencrypt:/letsencrypt
+      - ./userFile:/userFile:ro
     networks:
       - public
       - private
-    logging:
-      options:
-        max-size: 10m
-        max-file: 3
-    restart: unless-stopped
+    env_file:
+      - .env.traefik
+    # <<: *logging
 
-  whoami:
-    image: traefik/whoami
-    container_name: whoami
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.whoami.rule=Host(`whoami.${HOST_NAME}`)
-      # - traefik.http.routers.whoami.entrypoints=websecure
-      # - traefik.http.routers.whoami.tls.certresolver=myresolver
-    networks:
-      - private
+  # whoami:
+  #   image: traefik/whoami
+  #   container_name: whoami
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.whoami.rule=Host(`whoami.${HOST_NAME}`)
+  #     - traefik.http.routers.whoami.entrypoints=https
+  #     # - traefik.http.routers.whoami.tls.certresolver=myresolver
+  #   networks:
+  #     - private
+
+#   mongo:
+#     image: mongo:7.0.1
+#     container_name: mongo
+#     restart: unless-stopped
+#     env_file:
+#       - ./.env.mongo
+#     volumes:
+#       - mongo:/data/db
+#       - ./services/mongo/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+#     networks:
+#       - private
+#     labels:
+#       - traefik.enable=true
+#       # - traefik.tcp.routers.mongo.rule=HostSNI(`${HOST_NAME}`)
+#       - traefik.tcp.routers.mongo.rule=HostSNI(`*`)
+#       - traefik.tcp.routers.mongo.service=mongo
+#       # - traefik.tcp.routers.mongo.entrypoints=mongo
+#       - traefik.tcp.services.mongo.loadbalancer.server.port=27001
+#       # - traefik.http.routers.mongo.tls.certresolver=myresolver
+#       # - traefik.http.routers.mongo.entrypoints=websecure
+
+volumes:
+  mongo:
+  letsencrypt:

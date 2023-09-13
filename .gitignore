@@ -1,4 +1,7 @@
 .migrations.properties
 *.secret
-*.env
+.env
+.env.*
 letsencrypt/*
+userFile
+certs/*.pem

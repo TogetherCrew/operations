@@ -1,0 +1,49 @@
+http:
+  routers:
+    api:
+      rule: "Host(`traefik.{{ env "HOST_NAME" }}`)"
+      service: "api@internal"
+      tls:
+        domains:
+          - main: "{{ env "HOST_NAME" }}"
+            sans:
+              - "*.{{ env "HOST_NAME" }}"
+      middlewares:
+        - auth
+  middlewares:
+    auth:
+      basicAuth:
+        usersFile: ./userFile
+
+{{ if (eq (env "ENVIRONMENT") "development") }}
+# Development
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/certs/local-cert.pem
+        keyFile: /etc/certs/local-key.pem
+
+{{ else }}
+# Production
+
+certificatesresolvers:
+  cloudflare:
+    acme:
+      dnschallenge: true
+      provider: cloudflare
+      email: postmaster@togethercrew.com
+      storage: /letsencrypt/acme.json
+      caserver: https://acme-staging-v02.api.letsencrypt.org/directory
+
+tls:
+  stores:
+    default:
+      defaultGeneratedCert:
+        resolver: cloudflare
+        domain:
+          main: "{{ env "HOST_NAME" }}"
+          sans: "*.{{ env "HOST_NAME" }}"
+
+{{ end }}
