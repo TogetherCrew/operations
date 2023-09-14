@@ -62,8 +62,9 @@ services:
       - traefik.enable=true
       - traefik.tcp.routers.mongo.rule=HostSNI(`*`)
       - traefik.tcp.routers.mongo.entrypoints=mongo
+      - traefik.tcp.routers.mongo.tls=true
       - traefik.tcp.services.mongo.loadbalancer.server.port=27017
-      # - traefik.tcp.routers.mongo.tls=true
+      
 
 
 volumes:
