@@ -1,0 +1,7 @@
+[mongo]
+host=mongodb://root:pass@localhost:27017
+username=root
+password=pass
+database=Saga
+migrations=migrations
+dry_run=False
