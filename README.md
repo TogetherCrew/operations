@@ -39,3 +39,9 @@ This repository houses a collection of code artifacts, including Github actions,
 - Head over to traefik.*yourdomain.com*
 - Enter the user and password from the basic auth.
 - You should see your traefik dashboard.
+
+## Running Neo4j migrations
+
+- Install [neo4j-migrations](https://michael-simons.github.io/neo4j-migrations/2.2.2/#cli) tool
+- Create a file `.migrations.properties` under the db folder for neo4j based on `.migrations.properties.example`
+- run the `neo4j-migrations apply` within `db` directory (the directory containing the `.migrations.properties`) to run neo4j migrations
