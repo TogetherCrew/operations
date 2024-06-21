@@ -657,7 +657,7 @@ services:
     networks:
       monitoring:
         ipv4_address: 172.22.0.15 # 172.22.22.15
-    <<: [ *sm-resources-common ]
+    # <<: [ *sm-resources-common ]
 
   node-exporter:
     container_name: node-exporter
