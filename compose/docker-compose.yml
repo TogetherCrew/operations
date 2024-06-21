@@ -7,6 +7,8 @@ x-logging: &logging
       loki-url: http://172.22.0.15:3100/loki/api/v1/push
       loki-retries: 5
       loki-batch-size: 400
+  depends_on:
+    - loki
 
 x-sm-resources-common: &sm-resources-common
   deploy:
