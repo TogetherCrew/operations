@@ -159,7 +159,7 @@ services:
     env_file:
       - ./.env.mongodb
     volumes:
-      - ./mongo/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
       - ./mongo/healthcheck.js:/etc/mongo/healthcheck.js:ro
       - mongodb_data_container:/data/db
     networks:
