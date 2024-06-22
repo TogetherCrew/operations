@@ -161,6 +161,7 @@ services:
     volumes:
       - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
       - ./mongo/healthcheck.js:/etc/mongo/healthcheck.js:ro
+      - ./mongo/replica.key:/etc/mongo/replica.key:ro
       - mongodb_data_container:/data/db
     networks:
       - production

@@ -8,3 +8,5 @@ certs/*
 
 __pycache__
 db/mongo/config.ini
+
+*.key
