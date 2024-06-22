@@ -20,7 +20,7 @@ x-md-resources-common: &md-resources-common
       limits:
         cpus: '1'
         memory: 2G
-  <<: [ *logging ]
+  # <<: [ *logging ]
 
 x-lg-resources-common: &lg-resources-common
   deploy:
