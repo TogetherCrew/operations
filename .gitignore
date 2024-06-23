@@ -10,3 +10,4 @@ __pycache__
 db/mongo/config.ini
 
 *.key
+*.pem
