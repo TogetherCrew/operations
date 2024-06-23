@@ -706,19 +706,18 @@ services:
       - monitoring
       - production
     <<: [ *sm-resources-common ]
-
   ### SERVICE MANAGEMENT ###
 
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower:1.7.1
-    command: --interval 10 --http-api-metrics --http-api-token demotoken -d
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - monitoring
-    <<: [ *sm-resources-common ]
+  # watchtower:
+  #   container_name: watchtower
+  #   image: containrrr/watchtower:1.7.1
+  #   command: --interval 10 --http-api-metrics --http-api-token demotoken -d
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - monitoring
+  #   <<: [ *sm-resources-common ]
 
 volumes:
   mongodb_data_container:
