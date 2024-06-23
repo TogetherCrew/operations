@@ -80,9 +80,10 @@ else
     
     echo 2. Migrating...
     docker run --rm -v compose_$volume:$path -v $(pwd)/operations/backup:/backup ubuntu bash -c "cd $path && tar -xvf ../../backup/$volume.tar --strip 1"
+    # docker run --rm -v compose_mongodb_data_container:/data/db/ -v $(pwd)/operations/backup:/backup ubuntu bash
     
     echo 3. Deleting .tar
-    rm ./backup/$volume.tar
+    # rm ./backup/$volume.tar
 
     echo 4. Completed
   done
