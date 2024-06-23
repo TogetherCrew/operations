@@ -20,7 +20,7 @@ x-md-resources-common: &md-resources-common
       limits:
         cpus: '1'
         memory: 2G
-  # <<: [ *logging ]
+  <<: [ *logging ]
 
 x-lg-resources-common: &lg-resources-common
   deploy:
@@ -103,7 +103,7 @@ x-airflow-common: &airflow-common
   networks:
     - production
     - monitoring
-  <<: [ *sm-resources-common ]
+  <<: [ *md-resources-common ]
 
 x-hivemind-common: &hivemind-common
   image: ghcr.io/togethercrew/hivemind-bot:main
