@@ -76,11 +76,10 @@ else
     echo "######################################"
 
     echo 1. Downloading...
-    ssh -i "$pem" $source "sudo docker run --rm -v development_$volume:$path ubuntu tar -cvf - -C $path ." > ./backup/$volume.tar
+    # ssh -i "$pem" $source "sudo docker run --rm -v development_$volume:$path ubuntu tar -cvf - -C $path ." > ./backup/$volume.tar
     
     echo 2. Migrating...
-    docker run --rm -v compose_$volume:$path -v $(pwd)/operations/backup:/backup ubuntu bash -c "cd $path && tar -xvf ../../backup/$volume.tar --strip 1"
-    # docker run --rm -v compose_mongodb_data_container:/data/db/ -v $(pwd)/operations/backup:/backup ubuntu bash
+    docker run --rm -v compose_$volume:$path -v ./backup:/backup ubuntu bash -c "cd $path && tar -xvf ../../backup/$volume.tar --strip 1"
     
     echo 3. Deleting .tar
     # rm ./backup/$volume.tar
