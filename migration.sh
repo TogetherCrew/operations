@@ -11,7 +11,6 @@ source=$2
 echo pem: $pem
 echo source: $source
 
-
 # source volume
 volumes=(
   mongodb_data_container
@@ -74,7 +73,7 @@ else
     echo "######################################"
 
     echo 1. Downloading...
-    ssh -i $pem $source "sudo docker run --rm -v development_$volume:$path ubuntu tar -cvf - -C $path ." > $volume.tar
+    ssh -i "$pem" $source "sudo docker run --rm -v development_$volume:$path ubuntu tar -cvf - -C $path ." > $volume.tar
     
     echo 3. Migrating...
     # docker run --rm -v compose_$volume:$path -v $(pwd)/backup/:/backup/ ubuntu bash -c "cd $path && tar -xvf ../../backup/$volume.tar --strip 1"
