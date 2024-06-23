@@ -79,7 +79,8 @@ else
     # ssh -i "$pem" $source "sudo docker run --rm -v development_$volume:$path ubuntu tar -cvf - -C $path ." > ./backup/$volume.tar
     
     echo 2. Migrating...
-    docker run --rm -v compose_$volume:$path -v ./backup:/backup ubuntu bash -c "cd $path && tar -xvf ../../backup/$volume.tar --strip 1"
+    docker run --rm -v compose_$volume:$path -v ./backup:/backup ubuntu bash -c "cd $path && tar -xvf ${pwd}/backup/$volume.tar --strip 1"
+    # docker run --rm -v ./backup:/backup ubuntu bash
     
     # echo 3. Deleting .tar
     # rm ./backup/$volume.tar
