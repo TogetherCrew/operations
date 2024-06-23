@@ -73,10 +73,10 @@ else
     echo "######################################"
 
     echo 1. Downloading...
-    ssh -i "$pem" $source "sudo docker run --rm -v development_$volume:$path ubuntu tar -cvf - -C $path ." > $volume.tar
+    ssh -i "$pem" $source "sudo docker run --rm -v development_$volume:$path ubuntu tar -cvf - -C $path ." > ./backup/$volume.tar
     
     echo 3. Migrating...
-    # docker run --rm -v compose_$volume:$path -v $(pwd)/backup/:/backup/ ubuntu bash -c "cd $path && tar -xvf ../../backup/$volume.tar --strip 1"
+    # docker run --rm -v compose_$volume:$path -v ./backup/:/backup/ ubuntu bash -c "cd $path && tar -xvf ../../backup/$volume.tar --strip 1"
     
     echo 4. Completed
   done
