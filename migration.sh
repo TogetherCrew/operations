@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Declare arrays
+declare -a volumes
+declare -a paths
+
 # Load env vars
 pem=$1
 source=$2
@@ -7,9 +11,6 @@ source=$2
 echo pem: $pem
 echo source: $source
 
-# Declare arrays
-declare -a volumes
-declare -a paths
 
 # source volume
 volumes=(
