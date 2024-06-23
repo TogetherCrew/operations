@@ -24,7 +24,7 @@ volumes=(
   grafana_volume
   prometheus_volume
   loki_volume
-  pgvector_data
+  # pgvector_data
   airflow_config
   airflow_logs
   airflow_plugins
@@ -44,7 +44,7 @@ paths=(
   /var/lib/grafana/
   /prometheus/
   /data/loki/
-  /var/lib/postgresql/data/
+  # /var/lib/postgresql/data/
   /opt/airflow/config/
   /opt/airflow/logs/
   /opt/airflow/plugins/
