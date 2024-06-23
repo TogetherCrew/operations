@@ -6,8 +6,12 @@ This repository houses a collection of code artifacts, including Github actions,
 1. `cd compose`
 2. In the `/redis` folder, create a random password for each redis service (replace `PASSWORD`). See `/redis/example.*.conf` files for required inputs.
 3. Configure the environments for each service by creating your `.env.*` files. See `example.env.*` files for required inputs.
-4. Create replica.key for mongodb. `openssl rand -base64 756 > /mongo/replica.key`.
-5. Make the replica.key read-only: `chmod 400 /mongo/replica.key`.
+4. Create replica.key for mongodb:
+```sh
+openssl rand -base64 756 > mongo/replica.key # create replica.key
+chmod 400 mongo/replica.key # read-only
+sudo chown 999:999 mongo/replica.key # change ownership
+```
 5. On Github generate a app and get the private key, place it in a file `githubapp.private-key.pem`.
 6. Run `docker compose up`
 
