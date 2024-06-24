@@ -103,7 +103,7 @@ x-airflow-common: &airflow-common
   networks:
     - production
     - monitoring
-  <<: [ *md-resources-common ]
+  <<: [ *lg-resources-common ]
 
 x-hivemind-common: &hivemind-common
   image: ghcr.io/togethercrew/hivemind-bot:main
