@@ -1,7 +1,6 @@
 server {
     server_name ${NGINX_HOST};
-    listen 80;
-
+    
     location / {
         proxy_pass http://api:3000;
         proxy_set_header Host $host;
@@ -9,4 +8,20 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+
+    listen [::]:443 ssl ipv6only=on;
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/certs/${CERT_NAME}.pem;
+    ssl_certificate_key /etc/nginx/certs/${CERT_NAME}.key;
+}
+
+server {
+    if ($host = ${NGINX_HOST}) {
+        return 301 https://$host$request_uri;
+    }
+
+    server_name ${NGINX_HOST};
+    listen [::]:80;
+    listen 80;
+    return 404;
 }

@@ -150,7 +150,8 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
     env_file:
       - ./.env.nginx
     depends_on:
