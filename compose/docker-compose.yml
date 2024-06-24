@@ -327,10 +327,10 @@ services:
     container_name: api
     image: ghcr.io/togethercrew/api:main
     restart: unless-stopped
-    environment:
-      PORT: $PORT
-    ports:
-      - $HOST:$PORT:$PORT
+    # environment:
+    #   PORT: $PORT
+    # ports:
+    #   - $HOST:$PORT:$PORT
     env_file:
       - ./.env.api
     depends_on:
