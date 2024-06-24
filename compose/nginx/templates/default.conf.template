@@ -2,6 +2,7 @@ events { }
 
 http {
     server {
+        server_name ${NGINX_HOST}
         listen 80;
 
         location / {

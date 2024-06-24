@@ -150,7 +150,9 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/templates:/etc/nginx/templates
+    env_file:
+      - ./.env.nginx
     depends_on:
       - api
     networks:
