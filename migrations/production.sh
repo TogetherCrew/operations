@@ -2,8 +2,6 @@
 
 declare -a production_volumes
 declare -a monitoring_volumes
-declare -a production_paths
-declare -a monitoring_paths
 
 production_volumes=(
   mongodb_data_container
@@ -27,6 +25,9 @@ run() {
   echo $volumes
   echo $prepend
 
+  volume_length=${#volumes[@]}
+  echo $volume_length
+
   # Loop x times
   for ((i=1; i<=volume_length; i++)); do
     j=i-1
@@ -47,6 +48,6 @@ run() {
   done
 }
 
-run monitoring_volumes "monitoring"
+run $monitoring_volumes "monitoring"
 
 echo Finished
