@@ -22,11 +22,7 @@ run() {
   volume=$1
   prepend=$2
   echo "######################################"
-  echo $volume
-  echo docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
-  echo "######################################"
-
-  echo Migrating...
+  echo Migrating $volume
   docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
   echo Completed
 }
@@ -35,6 +31,12 @@ length=${#monitoring_volumes[@]}
 for ((i=0; i<length; i++)); do
   volume=${monitoring_volumes[$i]}
   run $volume "monitoring"
+done
+
+length=${#production_volumes[@]}
+for ((i=0; i<length; i++)); do
+  volume=${production_volumes[$i]}
+  run $volume "production"
 done
 
 echo Finished
