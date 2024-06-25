@@ -68,3 +68,5 @@ run() {
 }
 
 run $monitoring_volumes $monitoring_paths monitoring
+
+echo Finished
