@@ -39,7 +39,7 @@ run() {
   paths=$2
   prepend=$3
 
-  echo $volume
+  echo $volumes
   echo $paths
   echo $prepend
 
@@ -64,7 +64,7 @@ run() {
       echo "######################################"
       echo "######################################"
 
-      echo docker run --rm -v $prepend_$volume:$path -v compose_$volume:/backup ubuntu cp -a $path /backup
+      echo docker run --rm -v "${prepend}_${volume}":$path -v compose_$volume:/backup ubuntu cp -a $path /backup
 
       echo Migrating...
       docker run --rm -v $prepend_$volume:$path -v compose_$volume:/backup ubuntu cp -a $path /backup
