@@ -23,7 +23,7 @@ run() {
   prepend=$2
   echo "######################################"
   echo Migrating $volume
-  docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
+  docker run --rm -v "${prepend}_${volume}":/source:ro -v compose_$volume:/target ubuntu cp -av source/. target
   echo Completed
 }
 
