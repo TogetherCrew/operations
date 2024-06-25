@@ -60,6 +60,8 @@ run() {
       echo "######################################"
       echo "######################################"
 
+      echo docker run --rm -v $prepend_$volume:$path -v compose_$volume:/backup ubuntu cp -a $path /backup
+
       echo Migrating...
       docker run --rm -v $prepend_$volume:$path -v compose_$volume:/backup ubuntu cp -a $path /backup
       echo Completed
