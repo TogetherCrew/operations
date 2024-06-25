@@ -19,35 +19,22 @@ monitoring_volumes=(
 )
 
 run() {
-  volumes=$1
-  prepend=$3
+  volume=$1
+  prepend=$2
+  echo "######################################"
+  echo $volume
+  echo docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
+  echo "######################################"
 
-  echo $volumes
-  echo $prepend
-
-  volume_length=${#volumes[@]}
-  echo $volume_length
-
-  # Loop x times
-  for ((i=1; i<=volume_length; i++)); do
-    j=i-1
-    volume=${volumes[$j]}
-    echo "######################################"
-    echo "######################################"
-    echo "######################################"
-    echo $volume
-    echo "######################################"
-    echo "######################################"
-    echo "######################################"
-
-    echo docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
-
-    echo Migrating...
-    docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
-    echo Completed
-  done
+  echo Migrating...
+  docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
+  echo Completed
 }
 
-run $monitoring_volumes "monitoring"
+length=${#monitoring_volumes[@]}
+for ((i=1; i<=length; i++)); do
+  j=i-1
+  run ${volumes[$j]} "monitoring"
+end
 
 echo Finished
