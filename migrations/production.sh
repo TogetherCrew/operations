@@ -39,6 +39,10 @@ run() {
   paths=$2
   prepend=$3
 
+  echo $volume
+  echo $paths
+  echo $prepend
+
   # Get the length of the arrays
   volume_length=${#volumes[@]}
   paths_length=${#paths[@]}
@@ -69,6 +73,6 @@ run() {
   fi
 }
 
-run $monitoring_volumes $monitoring_paths monitoring
+run $monitoring_volumes $monitoring_paths "monitoring"
 
 echo Finished
