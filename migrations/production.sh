@@ -20,59 +20,34 @@ monitoring_volumes=(
   loki_volume
 )
 
-production_paths=(
-  /data/db/
-  /var/lib/rabbitmq/
-  /data/
-  /import/
-  /plugins/
-)
-
-monitoring_paths=(
-  /var/lib/grafana/
-  /prometheus/
-  /data/loki/
-)
-
 run() {
   volumes=$1
-  paths=$2
   prepend=$3
 
   echo $volumes
-  echo $paths
   echo $prepend
 
-  # Get the length of the arrays
-  volume_length=${#volumes[@]}
-  paths_length=${#paths[@]}
+  # Loop x times
+  for ((i=1; i<=volume_length; i++)); do
+    j=i-1
+    volume=${volumes[$j]}
+    path=${paths[$j]}
+    echo "######################################"
+    echo "######################################"
+    echo "######################################"
+    echo $volume, $path
+    echo "######################################"
+    echo "######################################"
+    echo "######################################"
 
-  # Compare the lengths
-  if [ $volume_length -ne $paths_length ]; then
-    echo "diff length! $volume_length $paths_length"
-  else
-    # Loop x times
-    for ((i=1; i<=volume_length; i++)); do
-      j=i-1
-      volume=${volumes[$j]}
-      path=${paths[$j]}
-      echo "######################################"
-      echo "######################################"
-      echo "######################################"
-      echo $volume, $path
-      echo "######################################"
-      echo "######################################"
-      echo "######################################"
+    echo docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
 
-      echo docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
-
-      echo Migrating...
-      docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
-      echo Completed
-    done
-  fi
+    echo Migrating...
+    docker run --rm -v "${prepend}_${volume}":/source -v compose_$volume:/target ubuntu cp -av source/. target
+    echo Completed
+  done
 }
 
-run $monitoring_volumes $monitoring_paths "monitoring"
+run monitoring_volumes "monitoring"
 
 echo Finished
