@@ -32,9 +32,8 @@ run() {
 }
 
 length=${#monitoring_volumes[@]}
-for ((i=1; i<=length; i++)); do
-  j=i-1
-  run ${volumes[$j]} "monitoring"
+for ((i=0; i<length; i++)); do
+  run ${volumes[$i]} "monitoring"
 end
 
 echo Finished
