@@ -61,7 +61,7 @@ run() {
       echo "######################################"
 
       echo Migrating...
-      ssh -i "$pem" $source "docker run --rm -v $prepend_$volume:$path -v compose_$volume:/backup ubuntu cp -a $path /backup
+      docker run --rm -v $prepend_$volume:$path -v compose_$volume:/backup ubuntu cp -a $path /backup
       echo Completed
     done
   fi
