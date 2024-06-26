@@ -86,7 +86,7 @@ x-redis: &redis
 x-airflow-common: &airflow-common
   image: ghcr.io/togethercrew/airflow-dags:main
   restart: unless-stopped
-  env_file: &airflow-common-env
+  env_file:
     - ./.env.airflow
   volumes:
     - airflow_logs:/opt/airflow/logs
@@ -572,8 +572,8 @@ services:
   hivemind-server:
     container_name: hivemind-server
     <<: [ *hivemind-common, *sm-resources-common ]
-    depends_on:
-      <<: *hivemind-common-depends-on
+    # depends_on:
+    # <<: *hivemind-common-depends-on
 
   hivemind-worker:
     container_name: hivemind-worker
@@ -745,25 +745,25 @@ services:
   #     - monitoring
   #   <<: [ *sm-resources-common ]
 
-  ubuntu:
-    image: ubuntu
-    volumes:
-      - mongodb_data_container:/mongodb_data_container
-      - rmq_data_container:/rmq_data_container
-      - neo4j_data:/neo4j_data
-      - neo4j_import:/neo4j_import
-      - neo4j_plugins:/neo4j_plugins
-      - grafana_volume:/grafana_volume
-      - prometheus_volume:/prometheus_volume
-      - loki_volume:/loki_volume
-      - pgvector_data:/pgvector_data
-      - airflow_config:/airflow_config
-      - airflow_logs:/airflow_logs
-      - airflow_plugins:/airflow_plugins
-      - airflow_sources:/airflow_sources
-      - tempo_data:/tempo_data
-      - qdrant_data:/qdrant_data
-      - qdrant_snapshots:/qdrant_snapshots
+  # ubuntu:
+  #   image: ubuntu
+  #   volumes:
+  #     - mongodb_data_container:/mongodb_data_container
+  #     - rmq_data_container:/rmq_data_container
+  #     - neo4j_data:/neo4j_data
+  #     - neo4j_import:/neo4j_import
+  #     - neo4j_plugins:/neo4j_plugins
+  #     - grafana_volume:/grafana_volume
+  #     - prometheus_volume:/prometheus_volume
+  #     - loki_volume:/loki_volume
+  #     - pgvector_data:/pgvector_data
+  #     - airflow_config:/airflow_config
+  #     - airflow_logs:/airflow_logs
+  #     - airflow_plugins:/airflow_plugins
+  #     - airflow_sources:/airflow_sources
+  #     - tempo_data:/tempo_data
+  #     - qdrant_data:/qdrant_data
+  #     - qdrant_snapshots:/qdrant_snapshots
 
 volumes:
   mongodb_data_container:
