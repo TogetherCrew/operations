@@ -164,8 +164,7 @@ services:
     env_file:
       - ./.env.nginx
     depends_on:
-      api:
-        condition: service_healthy
+      - api
     networks:
       - production
       - monitoring
