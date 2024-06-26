@@ -416,27 +416,27 @@ services:
       - monitoring
     <<: [ *md-resources-common ]
 
-  # discourse:
-  #   container_name: discourse
-  #   image: ghcr.io/togethercrew/discourse:main
-  #   command: yarn run start:prod
-  #   restart: always
-  #   ports:
-  #     - 43001:3000
-  #   env_file:
-  #     - .env.discourse
-  #   depends_on:
-  #     redis-discourse:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
-  #     neo4j:
-  #       condition: service_healthy
-  #   networks:
-  #     - discourse
-  #     - production
-  #     - monitoring
-  #   <<: [ *md-resources-common ]
+  discourse:
+    container_name: discourse
+    image: ghcr.io/togethercrew/discourse:main
+    command: yarn run start:prod
+    restart: always
+    ports:
+      - 43001:3000
+    env_file:
+      - .env.discourse
+    depends_on:
+      redis-discourse:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    networks:
+      - discourse
+      - production
+      - monitoring
+    <<: [ *md-resources-common ]
 
   # ### AIRFLOW ###
 
