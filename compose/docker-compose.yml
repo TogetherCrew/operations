@@ -87,65 +87,65 @@ x-redis: &redis
     - monitoring
   <<: [ *redis-healthcheck, *lg-resources-common ]
 
-# x-airflow-common: &airflow-common
-#   image: ghcr.io/togethercrew/airflow-dags:main
-#   restart: unless-stopped
-#   env_file:
-#     - ./.env.airflow
-#   volumes:
-#     - airflow_logs:/opt/airflow/logs
-#     - airflow_config:/opt/airflow/config
-#     - airflow_plugins:/opt/airflow/plugins
-#   user: "50000:0"
-#   depends_on: &airflow-common-depends-on
-#     redis-airflow:
-#       condition: service_healthy
-#     pgvector:
-#       condition: service_healthy
-#     neo4j:
-#       condition: service_healthy
-#     mongodb:
-#       condition: service_healthy
-#     qdrant-healthcheck:
-#       condition: service_healthy
-#   networks:
-#     - production
-#     - monitoring
-#   <<: [ *lg-resources-common ]
+x-airflow-common: &airflow-common
+  image: ghcr.io/togethercrew/airflow-dags:main
+  restart: unless-stopped
+  env_file:
+    - ./.env.airflow
+  volumes:
+    - airflow_logs:/opt/airflow/logs
+    - airflow_config:/opt/airflow/config
+    - airflow_plugins:/opt/airflow/plugins
+  user: "50000:0"
+  depends_on: &airflow-common-depends-on
+    redis-airflow:
+      condition: service_healthy
+    pgvector:
+      condition: service_healthy
+    neo4j:
+      condition: service_healthy
+    mongodb:
+      condition: service_healthy
+    qdrant-healthcheck:
+      condition: service_healthy
+  networks:
+    - production
+    - monitoring
+  <<: [ *lg-resources-common ]
 
-# x-hivemind-common: &hivemind-common
-#   image: ghcr.io/togethercrew/hivemind-bot:main
-#   restart: unless-stopped
-#   env_file:
-#     - ./.env.hivemind
-#   depends_on: &hivemind-common-depends-on
-#     neo4j:
-#       condition: service_healthy
-#     mongodb:
-#       condition: service_healthy
-#     pgvector:
-#       condition: service_healthy
-#   networks:
-#     - production
-#     - monitoring
-#   <<: [ *sm-resources-common ]
+x-hivemind-common: &hivemind-common
+  image: ghcr.io/togethercrew/hivemind-bot:main
+  restart: unless-stopped
+  env_file:
+    - ./.env.hivemind
+  depends_on: &hivemind-common-depends-on
+    neo4j:
+      condition: service_healthy
+    mongodb:
+      condition: service_healthy
+    pgvector:
+      condition: service_healthy
+  networks:
+    - production
+    - monitoring
+  <<: [ *sm-resources-common ]
 
-# x-telegram-common: &telegram-common
-#   image: ghcr.io/togethercrew/telegram:main
-#   restart: unless-stopped
-#   env_file:
-#     - ./.env.telegram
-#   depends_on:
-#     rabbitmq:
-#       condition: service_healthy
-#     neo4j:
-#       condition: service_healthy
-#     mongodb:
-#       condition: service_healthy
-#   networks:
-#     - production
-#     - monitoring
-#   <<: [ *md-resources-common ]
+x-telegram-common: &telegram-common
+  image: ghcr.io/togethercrew/telegram:main
+  restart: unless-stopped
+  env_file:
+    - ./.env.telegram
+  depends_on:
+    rabbitmq:
+      condition: service_healthy
+    neo4j:
+      condition: service_healthy
+    mongodb:
+      condition: service_healthy
+  networks:
+    - production
+    - monitoring
+  <<: [ *md-resources-common ]
 
 services:
 
@@ -440,167 +440,167 @@ services:
       - monitoring
     <<: [ *md-resources-common ]
 
-  # ### AIRFLOW ###
+  ### AIRFLOW ###
 
-  # airflow-webserver:
-  #   container_name: airflow-webserver
-  #   <<: *airflow-common
-  #   command: webserver
-  #   ports:
-  #     - 48080:8080
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD",
-  #         "curl",
-  #         "--fail",
-  #         "http://localhost:8080/health"
-  #       ]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 30s
-  #   depends_on:
-  #     <<: *airflow-common-depends-on
-  #     airflow-init:
-  #       condition: service_completed_successfully
+  airflow-webserver:
+    container_name: airflow-webserver
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - 48080:8080
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "http://localhost:8080/health"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
 
-  # airflow-scheduler:
-  #   container_name: airflow-scheduler
-  #   <<: *airflow-common
-  #   command: scheduler
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD",
-  #         "curl",
-  #         "--fail",
-  #         "http://localhost:8974/health"
-  #       ]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 30s
-  #   depends_on:
-  #     <<: *airflow-common-depends-on
-  #     airflow-init:
-  #       condition: service_completed_successfully
+  airflow-scheduler:
+    container_name: airflow-scheduler
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "http://localhost:8974/health"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
 
-  # airflow-worker:
-  #   container_name: airflow-worker
-  #   <<: [ *airflow-common, *lg-resources-common ]
-  #   command: celery worker
-  #   healthcheck:
-  #     # yamllint disable rule:line-length
-  #     test:
-  #       - "CMD-SHELL"
-  #       - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 30s
-  #   environment:
-  #     # Required to handle warm shutdown of the celery workers properly
-  #     # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
-  #     DUMB_INIT_SETSID: "0"
-  #   depends_on:
-  #     <<: *airflow-common-depends-on
-  #     airflow-init:
-  #       condition: service_completed_successfully
+  airflow-worker:
+    container_name: airflow-worker
+    <<: [ *airflow-common, *lg-resources-common ]
+    command: celery worker
+    healthcheck:
+      # yamllint disable rule:line-length
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    environment:
+      # Required to handle warm shutdown of the celery workers properly
+      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+      DUMB_INIT_SETSID: "0"
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
 
-  # airflow-triggerer:
-  #   container_name: airflow-triggerer
-  #   <<: *airflow-common
-  #   command: triggerer
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD-SHELL",
-  #         'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"'
-  #       ]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 30s
-  #   depends_on:
-  #     <<: *airflow-common-depends-on
-  #     airflow-init:
-  #       condition: service_completed_successfully
+  airflow-triggerer:
+    container_name: airflow-triggerer
+    <<: *airflow-common
+    command: triggerer
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"'
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
 
-  # airflow-init:
-  #   container_name: airflow-init
-  #   restart: "no"
-  #   <<: *airflow-common
-  #   entrypoint: /bin/bash
-  #   command: -c "./init.sh"
-  #   env_file:
-  #     - ./.env.airflow
-  #     - ./.env.airflow.init
-  #   user: "0:0"
-  #   volumes:
-  #     - airflow_sources:/sources
+  airflow-init:
+    container_name: airflow-init
+    restart: "no"
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command: -c "./init.sh"
+    env_file:
+      - ./.env.airflow
+      - ./.env.airflow.init
+    user: "0:0"
+    volumes:
+      - airflow_sources:/sources
 
-  # airflow-cli:
-  #   container_name: airflow-cli
-  #   restart: "no"
-  #   <<: *airflow-common
-  #   profiles:
-  #     - debug
-  #   environment:
-  #     CONNECTION_CHECK_MAX_COUNT: "0"
-  #   # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
-  #   command: bash -c airflow
+  airflow-cli:
+    container_name: airflow-cli
+    restart: "no"
+    <<: *airflow-common
+    profiles:
+      - debug
+    environment:
+      CONNECTION_CHECK_MAX_COUNT: "0"
+    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+    command: bash -c airflow
 
-  # # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
-  # # or by explicitly targeted on the command line e.g. docker-compose up flower.
-  # # See: https://docs.docker.com/compose/profiles/
-  # flower:
-  #   container_name: flower
-  #   <<: *airflow-common
-  #   command: celery flower
-  #   profiles:
-  #     - flower
-  #   ports:
-  #     - "5555:5555"
-  #   healthcheck:
-  #     test: [ "CMD", "curl", "--fail", "http://localhost:5555/" ]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 30s
-  #   restart: unless-stopped
-  #   depends_on:
-  #     <<: *airflow-common-depends-on
-  #     airflow-init:
-  #       condition: service_completed_successfully
+  # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
+  # or by explicitly targeted on the command line e.g. docker-compose up flower.
+  # See: https://docs.docker.com/compose/profiles/
+  flower:
+    container_name: flower
+    <<: *airflow-common
+    command: celery flower
+    profiles:
+      - flower
+    ports:
+      - "5555:5555"
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:5555/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
 
-  # hivemind-server:
-  #   container_name: hivemind-server
-  #   <<: [ *hivemind-common, *sm-resources-common ]
-  #   # depends_on:
-  #   # <<: *hivemind-common-depends-on
+  hivemind-server:
+    container_name: hivemind-server
+    <<: [ *hivemind-common, *sm-resources-common ]
+    # depends_on:
+    # <<: *hivemind-common-depends-on
 
-  # hivemind-worker:
-  #   container_name: hivemind-worker
-  #   <<: [ *hivemind-common, *xl-resources-common ]
-  #   command: python3 worker.py
+  hivemind-worker:
+    container_name: hivemind-worker
+    <<: [ *hivemind-common, *xl-resources-common ]
+    command: python3 worker.py
 
-  # ### TELEGRAM
+  ### TELEGRAM
 
-  # telegram-bot:
-  #   <<: [ *telegram-common ]
-  #   container_name: telegram-bot
-  #   command: [ "node", "dist/apps/bot/main" ]
+  telegram-bot:
+    <<: [ *telegram-common ]
+    container_name: telegram-bot
+    command: [ "node", "dist/apps/bot/main" ]
 
-  # telegram-events:
-  #   <<: [ *telegram-common ]
-  #   container_name: telegram-events
-  #   command: [ "node", "dist/apps/event-store/main" ]
+  telegram-events:
+    <<: [ *telegram-common ]
+    container_name: telegram-events
+    command: [ "node", "dist/apps/event-store/main" ]
 
-  # telegram-graph:
-  #   <<: [ *telegram-common ]
-  #   container_name: telegram-graph
-  #   command: [ "node", "dist/apps/graph-store/main" ]
+  telegram-graph:
+    <<: [ *telegram-common ]
+    container_name: telegram-graph
+    command: [ "node", "dist/apps/graph-store/main" ]
 
   ### ADMIN
 
