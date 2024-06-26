@@ -151,24 +151,25 @@ services:
 
   ### ROUTING ###
 
-  # nginx:
-  #   container_name: nginx
-  #   image: nginx:latest
-  #   restart: unless-stopped
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   volumes:
-  #     - ./nginx/templates:/etc/nginx/templates:ro
-  #     - ./nginx/ssl:/etc/ssl:ro
-  # env_file:
-  #   - ./.env.nginx
-  # depends_on:
-  #   - api
-  # networks:
-  #   - production
-  #   - monitoring
-  # <<: [ *sm-resources-common ]
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/ssl:/etc/ssl:ro
+  env_file:
+    - ./.env.nginx
+  depends_on:
+    api:
+      condition: service_healthy
+  networks:
+    - production
+    - monitoring
+  <<: [ *sm-resources-common ]
 
   ## DATABASES ###
 
