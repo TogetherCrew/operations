@@ -14,7 +14,23 @@ sudo chown 999:999 mongo/replica.key # change ownership
 ```
 5. On Github generate a app and get the private key, place it in a file `githubapp.private-key.pem`.
 6. Create an origin certificate on Cloudflare. Place both the .pem and .key files in the `/nginx/ssl` (make sure their name is the same as the `DOMAIN` in `.env.nginx`).
-6. Run `docker compose up`
+7. Allocate memswap:
+```bash
+free -h                           # Check Existing Swap Space
+
+sudo fallocate -l 4G /swapfile    # Create a 4GB swap file
+sudo chmod 600 /swapfile          # Set the correct permissions
+sudo mkswap /swapfile             # Set up the swap file
+sudo swapon /swapfile             # Enable the swap file
+
+# Verify Swap Space
+swapon --show 
+free -h
+
+# Persist the Swap File
+echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
+```
+6. Run `docker compose up -d`
 
 
 <!-- ## Localhost
