@@ -679,7 +679,8 @@ services:
     networks:
       monitoring:
         ipv4_address: 172.22.0.15
-    <<: [ *sm-resources-common ]
+    memswap_limit: 2G
+    # <<: [ *sm-resources-common ]
 
   node-exporter:
     container_name: node-exporter
