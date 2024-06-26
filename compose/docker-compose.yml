@@ -87,31 +87,31 @@ x-redis: &redis
     - monitoring
   <<: [ *redis-healthcheck, *lg-resources-common ]
 
-x-airflow-common: &airflow-common
-  image: ghcr.io/togethercrew/airflow-dags:main
-  restart: unless-stopped
-  env_file:
-    - ./.env.airflow
-  volumes:
-    - airflow_logs:/opt/airflow/logs
-    - airflow_config:/opt/airflow/config
-    - airflow_plugins:/opt/airflow/plugins
-  user: "50000:0"
-  depends_on: &airflow-common-depends-on
-    redis-airflow:
-      condition: service_healthy
-    pgvector:
-      condition: service_healthy
-    neo4j:
-      condition: service_healthy
-    mongodb:
-      condition: service_healthy
-    qdrant-healthcheck:
-      condition: service_healthy
-  networks:
-    - production
-    - monitoring
-  <<: [ *lg-resources-common ]
+# x-airflow-common: &airflow-common
+#   image: ghcr.io/togethercrew/airflow-dags:main
+#   restart: unless-stopped
+#   env_file:
+#     - ./.env.airflow
+#   volumes:
+#     - airflow_logs:/opt/airflow/logs
+#     - airflow_config:/opt/airflow/config
+#     - airflow_plugins:/opt/airflow/plugins
+#   user: "50000:0"
+#   depends_on: &airflow-common-depends-on
+#     redis-airflow:
+#       condition: service_healthy
+#     pgvector:
+#       condition: service_healthy
+#     neo4j:
+#       condition: service_healthy
+#     mongodb:
+#       condition: service_healthy
+#     qdrant-healthcheck:
+#       condition: service_healthy
+#   networks:
+#     - production
+#     - monitoring
+#   <<: [ *lg-resources-common ]
 
 # x-hivemind-common: &hivemind-common
 #   image: ghcr.io/togethercrew/hivemind-bot:main
