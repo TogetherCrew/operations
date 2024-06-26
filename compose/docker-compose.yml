@@ -682,6 +682,7 @@ services:
     networks:
       monitoring:
         ipv4_address: 172.22.0.15
+    mem_limit: 1G
     memswap_limit: 2G
     # <<: [ *sm-resources-common ]
 
