@@ -332,31 +332,31 @@ services:
 
   ### SERVICES ###
 
-  # api:
-  #   container_name: api
-  #   image: ghcr.io/togethercrew/api:main
-  #   restart: unless-stopped
-  #   # environment:
-  #   #   PORT: $PORT
-  #   # ports:
-  #   #   - $HOST:$PORT:$PORT
-  #   env_file:
-  #     - ./.env.api
-  #   depends_on:
-  #     mongodb:
-  #       condition: service_healthy
-  #     neo4j:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
-  #     redis-api:
-  #       condition: service_healthy
-  #   volumes:
-  #     - ./githubapp.private-key.pem:/project/githubapp.private-key.pem:ro
-  #   networks:
-  #     - production
-  #     - monitoring
-  #   <<: [ *sm-resources-common ]
+  api:
+    container_name: api
+    image: ghcr.io/togethercrew/api:main
+    restart: unless-stopped
+    # environment:
+    #   PORT: $PORT
+    # ports:
+    #   - $HOST:$PORT:$PORT
+    env_file:
+      - ./.env.api
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-api:
+        condition: service_healthy
+    volumes:
+      - ./githubapp.private-key.pem:/project/githubapp.private-key.pem:ro
+    networks:
+      - production
+      - monitoring
+    <<: [ *sm-resources-common ]
 
   # discord:
   #   container_name: discord
