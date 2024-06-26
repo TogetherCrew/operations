@@ -358,25 +358,25 @@ services:
       - monitoring
     <<: [ *sm-resources-common ]
 
-  # discord:
-  #   container_name: discord
-  #   image: ghcr.io/togethercrew/discord-bot:development
-  #   restart: unless-stopped
-  #   env_file:
-  #     - ./.env.discord
-  #   ports:
-  #     - 3300:3000
-  #   depends_on:
-  #     mongodb:
-  #       condition: service_healthy
-  #     redis-discord:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
-  #   networks:
-  #     - production
-  #     - monitoring
-  #   <<: [ *lg-resources-common ]
+  discord:
+    container_name: discord
+    image: ghcr.io/togethercrew/discord-bot:development
+    restart: unless-stopped
+    env_file:
+      - ./.env.discord
+    ports:
+      - 3300:3000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis-discord:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - production
+      - monitoring
+    <<: [ *lg-resources-common ]
 
   # analyzer-server:
   #   container_name: analyzer-server
