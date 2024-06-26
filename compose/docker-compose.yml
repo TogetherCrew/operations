@@ -7,6 +7,7 @@ x-logging: &logging
       loki-batch-size: 400
 
 x-sm-resources-common: &sm-resources-common
+  mem_limit: 1G
   memswap_limit: 2G
   <<: [ *logging ]
   # deploy:
@@ -16,6 +17,7 @@ x-sm-resources-common: &sm-resources-common
   #       memory: 1G
 
 x-md-resources-common: &md-resources-common
+  mem_limit: 2G
   memswap_limit: 4G
   <<: [ *logging ]
   # deploy:
@@ -25,6 +27,7 @@ x-md-resources-common: &md-resources-common
   #       memory: 2G
 
 x-lg-resources-common: &lg-resources-common
+  mem_limit: 4G
   memswap_limit: 8G
   <<: [ *logging ]
   # deploy:
@@ -34,6 +37,7 @@ x-lg-resources-common: &lg-resources-common
   #       memory: 4G
 
 x-xl-resources-common: &xl-resources-common
+  mem_limit: 8G
   memswap_limit: 16G
   <<: [ *logging ]
   # deploy:
