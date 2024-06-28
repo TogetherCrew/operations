@@ -128,7 +128,6 @@ x-hivemind-common: &hivemind-common
   networks:
     - production
     - monitoring
-  <<: [ *sm-resources-common ]
 
 x-telegram-common: &telegram-common
   image: ghcr.io/togethercrew/telegram:main
