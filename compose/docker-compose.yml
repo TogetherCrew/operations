@@ -114,7 +114,7 @@ x-airflow-common: &airflow-common
   <<: [ *lg-resources-common ]
 
 x-hivemind-common: &hivemind-common
-  image: ghcr.io/togethercrew/hivemind-bot:main
+  image: ghcr.io/togethercrew/hivemind-bot:pr-80
   restart: unless-stopped
   env_file:
     - ./.env.hivemind
@@ -576,15 +576,16 @@ services:
   hivemind-server:
     container_name: hivemind-server
     <<: [ *hivemind-common, *sm-resources-common ]
-    # depends_on:
-    # <<: *hivemind-common-depends-on
+    command: python3 server.py
 
   hivemind-worker:
     container_name: hivemind-worker
     <<: [ *hivemind-common, *xl-resources-common ]
-    command: python3 worker.py
+    # deploy:
+    #   mode: replicated
+    #   replicas: 2
 
-  ### TELEGRAM
+    ### TELEGRAM
 
   telegram-bot:
     <<: [ *telegram-common ]
