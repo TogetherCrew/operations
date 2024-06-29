@@ -10,41 +10,21 @@ x-sm-resources-common: &sm-resources-common
   mem_limit: 1G
   memswap_limit: 2G
   <<: [ *logging ]
-  # deploy:
-  #   resources:
-  #     limits:
-  #       cpus: '0.5'
-  #       memory: 1G
 
 x-md-resources-common: &md-resources-common
   mem_limit: 2G
   memswap_limit: 4G
   <<: [ *logging ]
-  # deploy:
-  #   resources:
-  #     limits:
-  #       cpus: '1'
-  #       memory: 2G
 
 x-lg-resources-common: &lg-resources-common
   mem_limit: 4G
   memswap_limit: 8G
   <<: [ *logging ]
-  # deploy:
-  #   resources:
-  #     limits:
-  #       cpus: '1'
-  #       memory: 4G
 
 x-xl-resources-common: &xl-resources-common
   mem_limit: 8G
   memswap_limit: 16G
   <<: [ *logging ]
-  # deploy:
-  #   resources:
-  #     limits:
-  #       cpus: '2'
-  #       memory: 8G
 
 x-redis-healthcheck: &redis-healthcheck
   healthcheck:
@@ -114,7 +94,7 @@ x-airflow-common: &airflow-common
   <<: [ *lg-resources-common ]
 
 x-hivemind-common: &hivemind-common
-  image: ghcr.io/togethercrew/hivemind-bot:pr-80
+  image: ghcr.io/togethercrew/hivemind-bot:main
   restart: unless-stopped
   env_file:
     - ./.env.hivemind
@@ -440,8 +420,6 @@ services:
     container_name: airflow-webserver
     <<: *airflow-common
     command: webserver
-    # ports:
-    # - 48080:8080
     healthcheck:
       test:
         [
@@ -629,8 +607,6 @@ services:
     depends_on:
       - prometheus
       - loki
-      # ports:
-      # - 3000:3000
     networks:
       - monitoring
     <<: [ *sm-resources-common ]
