@@ -12,8 +12,8 @@ ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECD
 
 map $host $backend {
     default http://api:3000;
-    api.${DOMAIN} http://api:3000;
-    grafana.${DOMAIN} http://grafana:3000;
+    api http://api:3000;
+    grafana http://grafana:3000;
 }
 
 server {
