@@ -12,8 +12,9 @@ ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECD
 
 server {
 
-
-    server_name ${NGINX_HOST};
+    server_name *.${DOMAIN};
+    listen [::]:443 ssl ipv6only=on;
+    listen 443 ssl;
     
     location / {
         proxy_pass http://api:3000;
@@ -23,18 +24,14 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    listen [::]:443 ssl ipv6only=on;
-    listen 443 ssl;
-
 }
 
 server {
-    if ($host = ${NGINX_HOST}) {
-        return 301 https://$host$request_uri;
-    }
 
-    server_name ${NGINX_HOST};
+    server_name *.${DOMAIN};
     listen [::]:80;
     listen 80;
-    return 404;
+
+    return 301 https://$host$request_uri;
+    
 }
