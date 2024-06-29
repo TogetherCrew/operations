@@ -657,7 +657,6 @@ services:
         ipv4_address: 172.22.0.15
     mem_limit: 1G
     memswap_limit: 2G
-    # <<: [ *sm-resources-common ]
 
   node-exporter:
     container_name: node-exporter
@@ -721,25 +720,6 @@ services:
     networks:
       - monitoring
     <<: [ *sm-resources-common ]
-  # ubuntu:
-  #   image: ubuntu
-  #   volumes:
-  #     - mongodb_data_container:/mongodb_data_container
-  #     - rmq_data_container:/rmq_data_container
-  #     - neo4j_data:/neo4j_data
-  #     - neo4j_import:/neo4j_import
-  #     - neo4j_plugins:/neo4j_plugins
-  #     - grafana_volume:/grafana_volume
-  #     - prometheus_volume:/prometheus_volume
-  #     - loki_volume:/loki_volume
-  #     - pgvector_data:/pgvector_data
-  #     - airflow_config:/airflow_config
-  #     - airflow_logs:/airflow_logs
-  #     - airflow_plugins:/airflow_plugins
-  #     - airflow_sources:/airflow_sources
-  #     - tempo_data:/tempo_data
-  #     - qdrant_data:/qdrant_data
-  #     - qdrant_snapshots:/qdrant_snapshots
 
 volumes:
   mongodb_data_container:
