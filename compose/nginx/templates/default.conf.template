@@ -15,9 +15,13 @@ resolver 127.0.0.11 valid=30s;
 resolver_timeout 5s;
 
 map $host $backend {
-    api.${DOMAIN}       http://api:3000;
-    grafana.${DOMAIN}   http://grafana:3000;
-    airflow.${DOMAIN}   http://airflow-webserver:8080;
+    api.${DOMAIN}           http://api:3000;
+    grafana.${DOMAIN}       http://grafana:3000;
+    airflow.${DOMAIN}       http://airflow-webserver:8080;
+    discord.${DOMAIN}       http://discord:3000;
+    discourse.${DOMAIN}     http://discourse:3000;
+    rabbitmq.${DOMAIN}      http://rabbitmq:15672;
+
 }
 
 server {

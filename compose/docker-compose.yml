@@ -182,7 +182,7 @@ services:
     restart: unless-stopped
     ports:
       - 6672:5672
-      - 25672:15672
+      # - 25672:15672
     volumes:
       - rmq_data_container:/var/lib/rabbitmq/
       - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
@@ -340,8 +340,8 @@ services:
     restart: unless-stopped
     env_file:
       - ./.env.discord
-    ports:
-      - 3300:3000
+      # ports:
+      # - 3300:3000
     depends_on:
       mongodb:
         condition: service_healthy
@@ -397,8 +397,8 @@ services:
     image: ghcr.io/togethercrew/discourse:main
     command: yarn run start:prod
     restart: always
-    ports:
-      - 43001:3000
+    # ports:
+    # - 43001:3000
     env_file:
       - .env.discourse
     depends_on:
