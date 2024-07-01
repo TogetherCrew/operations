@@ -328,7 +328,7 @@ services:
       redis-api:
         condition: service_healthy
     volumes:
-      - ./githubapp.private-key.pem:/project/githubapp.private-key.pem:ro
+      - ./github/githubapp.private-key.pem:/project/githubapp.private-key.pem:ro
     networks:
       - production
       - monitoring
