@@ -12,7 +12,7 @@ openssl rand -base64 756 > mongo/replica.key # create replica.key
 chmod 400 mongo/replica.key # read-only
 sudo chown 999:999 mongo/replica.key # change ownership
 ```
-5. On Github generate a app and get the private key, place it in a file `githubapp.private-key.pem`.
+5. On Github generate a app and get the private key, place it in a file `github/githubapp.private-key.pem`.
 6. Create an origin certificate on Cloudflare. Place both the .pem and .key files in the `/nginx/ssl` (make sure their name is the same as the `DOMAIN` in `.env.nginx`).
 7. Allocate memswap:
 ```bash
