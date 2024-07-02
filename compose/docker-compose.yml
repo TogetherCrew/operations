@@ -581,8 +581,8 @@ services:
     container_name: admin-panel
     image: ghcr.io/togethercrew/admin-panel:pr-6
     restart: always
-    ports:
-      - 8501:8501
+    # ports:
+    #   - 8501:8501
     env_file:
       - .env.admin-panel
     depends_on:

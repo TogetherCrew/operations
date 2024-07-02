@@ -21,6 +21,7 @@ map $host $backend {
     discord.${DOMAIN}       http://discord:3000;
     discourse.${DOMAIN}     http://discourse:3000;
     rabbitmq.${DOMAIN}      http://rabbitmq:15672;
+    admin.${DOMAIN}         http://admin-panel:8501;
 
 }
 
