@@ -25,6 +25,12 @@ map $host $backend {
 
 }
 
+# websockets
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
 server {
 
     server_name *.${DOMAIN};
