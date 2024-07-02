@@ -294,8 +294,8 @@ services:
 
   redis-discourse:
     container_name: redis-discourse
-    # volumes:
-    #   - ./redis/discourse.conf:/usr/local/etc/redis/redis.conf:ro
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     <<: [ *redis ]
 
   redis-airflow:
@@ -306,8 +306,8 @@ services:
 
   redis-cadvisor:
     container_name: redis-cadvisor
-    # volumes:
-    #   - ./redis/cadvisor.conf:/usr/local/etc/redis/redis.conf:ro
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     <<: [ *redis ]
 
   ### SERVICES ###

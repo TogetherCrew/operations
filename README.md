@@ -18,13 +18,13 @@ sudo chown 999:999 mongo/replica.key # change ownership
 ```bash
 free -h                           # Check Existing Swap Space
 
-sudo fallocate -l 4G /swapfile    # Create a 4GB swap file
+sudo fallocate -l 32G /swapfile   # Create a 32GB swap file
 sudo chmod 600 /swapfile          # Set the correct permissions
 sudo mkswap /swapfile             # Set up the swap file
 sudo swapon /swapfile             # Enable the swap file
 
 # Verify Swap Space
-swapon --show 
+swapon --show
 free -h
 
 # Persist the Swap File
