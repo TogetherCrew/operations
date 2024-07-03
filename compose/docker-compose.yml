@@ -246,6 +246,7 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
       - qdrant_snapshots:/qdrant/snapshots
+      - ./qdrant/config/production.yaml:/qdrant/config/production.yaml:ro
     networks:
       - production
       - monitoring
