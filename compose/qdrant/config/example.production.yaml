@@ -1,2 +1,10 @@
+log_level: INFO
+
 service:
   api_key: <API-KEY>
+  host: 0.0.0.0
+  http_port: 6333
+  grpc_port: 6334
+  enable_cors: true
+  enable_tls: false
+  verify_https_client_certificate: false
