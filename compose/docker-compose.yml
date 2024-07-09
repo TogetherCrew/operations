@@ -391,7 +391,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *md-resources-common ]
+    <<: [ *xl-resources-common ]
 
   discourse:
     container_name: discourse
