@@ -91,7 +91,7 @@ x-airflow-common: &airflow-common
   networks:
     - production
     - monitoring
-  <<: [ *lg-resources-common ]
+  # <<: [ *lg-resources-common ]
 
 x-hivemind-common: &hivemind-common
   image: ghcr.io/togethercrew/hivemind-bot:main
@@ -419,7 +419,7 @@ services:
 
   airflow-webserver:
     container_name: airflow-webserver
-    <<: *airflow-common
+    <<: [ *airflow-common, *lg-resources-common ]
     command: webserver
     healthcheck:
       test:
@@ -440,7 +440,7 @@ services:
 
   airflow-scheduler:
     container_name: airflow-scheduler
-    <<: *airflow-common
+    <<: [ *airflow-common, *lg-resources-common ]
     command: scheduler
     healthcheck:
       test:
@@ -461,7 +461,7 @@ services:
 
   airflow-worker:
     container_name: airflow-worker
-    <<: [ *airflow-common, *lg-resources-common ]
+    <<: [ *airflow-common, *xl-resources-common ]
     command: celery worker
     healthcheck:
       # yamllint disable rule:line-length
@@ -483,7 +483,7 @@ services:
 
   airflow-triggerer:
     container_name: airflow-triggerer
-    <<: *airflow-common
+    <<: [ *airflow-common, *lg-resources-common ]
     command: triggerer
     healthcheck:
       test:
@@ -503,7 +503,7 @@ services:
   airflow-init:
     container_name: airflow-init
     restart: "no"
-    <<: *airflow-common
+    <<: [ *airflow-common, *lg-resources-common ]
     entrypoint: /bin/bash
     command: -c "./init.sh"
     env_file:
@@ -516,7 +516,7 @@ services:
   airflow-cli:
     container_name: airflow-cli
     restart: "no"
-    <<: *airflow-common
+    <<: [ *airflow-common, *xl-resources-common ]
     profiles:
       - debug
     environment:
@@ -529,7 +529,7 @@ services:
   # See: https://docs.docker.com/compose/profiles/
   flower:
     container_name: flower
-    <<: *airflow-common
+    <<: [ *airflow-common, *lg-resources-common ]
     command: celery flower
     profiles:
       - flower
