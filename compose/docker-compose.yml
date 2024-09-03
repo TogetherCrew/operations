@@ -715,7 +715,7 @@ services:
     command: --interval 60 --http-api-metrics --http-api-token demotoken -d
     restart: unless-stopped
     env_file:
-    - ./.watchtower.airflow
+    - ./.env.watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
