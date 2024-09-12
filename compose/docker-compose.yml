@@ -555,9 +555,9 @@ services:
   hivemind-worker:
     container_name: hivemind-worker
     <<: [ *hivemind-common, *xl-resources-common ]
-    # deploy:
-    #   mode: replicated
-    #   replicas: 2
+    deploy:
+      mode: replicated
+      replicas: 3
 
     ### TELEGRAM
 
