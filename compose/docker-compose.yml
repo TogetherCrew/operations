@@ -553,7 +553,7 @@ services:
     command: python3 server.py
 
   hivemind-worker:
-    container_name: hivemind-worker
+    # container_name: hivemind-worker
     <<: [ *hivemind-common, *xl-resources-common ]
     deploy:
       mode: replicated
