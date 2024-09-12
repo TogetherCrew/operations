@@ -355,43 +355,43 @@ services:
       - monitoring
     <<: [ *lg-resources-common ]
 
-  analyzer-server:
-    container_name: analyzer-server
-    image: ghcr.io/togethercrew/discord-analyzer:main
-    command: python3 server.py
-    restart: unless-stopped
-    env_file:
-      - ./.env.analyzer
-    depends_on:
-      redis-analyzer:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    <<: [ *sm-resources-common ]
+  # analyzer-server:
+  #   container_name: analyzer-server
+  #   image: ghcr.io/togethercrew/discord-analyzer:main
+  #   command: python3 server.py
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./.env.analyzer
+  #   depends_on:
+  #     redis-analyzer:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   networks:
+  #     - production
+  #     - monitoring
+  #   <<: [ *sm-resources-common ]
 
-  analyzer-worker:
-    container_name: analyzer-worker
-    image: ghcr.io/togethercrew/discord-analyzer:main
-    command: python3 worker.py
-    restart: unless-stopped
-    env_file:
-      - ./.env.analyzer
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      redis-analyzer:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    <<: [ *xl-resources-common ]
+  # analyzer-worker:
+  #   container_name: analyzer-worker
+  #   image: ghcr.io/togethercrew/discord-analyzer:main
+  #   command: python3 worker.py
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./.env.analyzer
+  #   depends_on:
+  #     mongodb:
+  #       condition: service_healthy
+  #     redis-analyzer:
+  #       condition: service_healthy
+  #     neo4j:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   networks:
+  #     - production
+  #     - monitoring
+  #   <<: [ *xl-resources-common ]
 
   discourse:
     container_name: discourse
