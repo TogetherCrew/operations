@@ -580,7 +580,7 @@ services:
 
   admin-panel:
     container_name: admin-panel
-    image: ghcr.io/togethercrew/admin-panel:pr-6
+    image: ghcr.io/togethercrew/admin-panel:main
     restart: always
     env_file:
       - .env.admin-panel
