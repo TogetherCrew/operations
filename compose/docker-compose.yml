@@ -576,6 +576,11 @@ services:
     container_name: telegram-graph
     command: [ "node", "dist/apps/graph-store/main" ]
 
+  question-service:
+    image: ghcr.io/togethercrew/question-service:main
+    platform: linux/x86_64
+    <<: [ *sm-resources-common ]
+
   ### ADMIN
 
   admin-panel:
