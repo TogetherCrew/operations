@@ -584,9 +584,12 @@ services:
   question-service:
     image: ghcr.io/togethercrew/question-service:main
     container_name: question-service
-    command: ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
+    # command: ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
     platform: linux/x86_64
     <<: [ *sm-resources-common ]
+    networks:
+      - production
+      - monitoring
 
   ### ADMIN
 
