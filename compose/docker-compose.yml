@@ -579,7 +579,7 @@ services:
   telegram-question:
     <<: [ *telegram-common ]
     container_name: telegram-question
-    command: [ "node", "dist/apps/question-service/main" ]
+    command: [ "node", "dist/apps/question/main" ]
 
   question-service:
     image: ghcr.io/togethercrew/question-service:main
