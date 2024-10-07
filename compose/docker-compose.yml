@@ -132,7 +132,7 @@ x-discourse-common: &discourse-common
   env_file:
     - .env.discourse
   depends_on:
-    redis:
+    redis-discourse:
       condition: service_healthy
     rabbitmq:
       condition: service_healthy
