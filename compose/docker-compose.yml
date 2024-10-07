@@ -416,17 +416,17 @@ services:
   discourse-extractor:
     <<: [ *discourse-common ]
     container_name: discourse-extractor
-    command: yarn run start:prod extractor
+    command: [ "node", "dist/apps/extractor/main" ]
 
   discourse-graph:
     <<: [ *discourse-common ]
     container_name: discourse-graph
-    command: yarn run start:prod graph
+    command: [ "node", "dist/apps/graph/main" ]
 
   discourse-mongo:
     <<: [ *discourse-common ]
     container_name: discourse-mongo
-    command: yarn run start:prod mongo
+    command: [ "node", "dist/apps/mongo/main" ]
 
   ### AIRFLOW ###
 
