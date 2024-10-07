@@ -144,6 +144,7 @@ x-discourse-common: &discourse-common
     - discourse
     - production
     - monitoring
+  <<: [ *sm-resources-common ]
 
 services:
 
@@ -414,20 +415,17 @@ services:
 
   discourse-extractor:
     <<: [ *discourse-common ]
-    <<: [ *sm-resources-common ]
     container_name: discourse-extractor
     command: yarn run start:prod extractor
 
   discourse-graph:
     <<: [ *discourse-common ]
-    <<: [ *sm-resources-common ]
-    container_name: discourse-extractor
+    container_name: discourse-graph
     command: yarn run start:prod graph
 
   discourse-mongo:
     <<: [ *discourse-common ]
-    <<: [ *sm-resources-common ]
-    container_name: discourse-extractor
+    container_name: discourse-mongo
     command: yarn run start:prod mongo
 
   ### AIRFLOW ###
