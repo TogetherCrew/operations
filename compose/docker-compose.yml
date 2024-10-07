@@ -127,7 +127,7 @@ x-telegram-common: &telegram-common
   <<: [ *md-resources-common ]
 
 x-discourse-common: &discourse-common
-  image: ghcr.io/togethercrew/telegram:main
+  image: ghcr.io/togethercrew/discourse:main
   restart: always
   env_file:
     - .env.discourse
