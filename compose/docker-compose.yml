@@ -126,6 +126,25 @@ x-telegram-common: &telegram-common
     - monitoring
   <<: [ *md-resources-common ]
 
+x-discourse-common: &discourse-common
+  image: ghcr.io/togethercrew/telegram:main
+  restart: always
+  env_file:
+    - .env.discourse
+  depends_on:
+    redis:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    neo4j:
+      condition: service_healthy
+    mongodb:
+      condition: service_healthy
+  networks:
+    - discourse
+    - production
+    - monitoring
+
 services:
 
   ### ROUTING ###
@@ -393,27 +412,23 @@ services:
   #     - monitoring
   #   <<: [ *xl-resources-common ]
 
-  discourse:
-    container_name: discourse
-    image: ghcr.io/togethercrew/discourse:main
-    command: yarn run start:prod
-    restart: always
-    # ports:
-    # - 43001:3000
-    env_file:
-      - .env.discourse
-    depends_on:
-      redis-discourse:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-    networks:
-      - discourse
-      - production
-      - monitoring
-    <<: [ *md-resources-common ]
+  discourse-extractor:
+    <<: [ *discourse-common ]
+    <<: [ *sm-resources-common ]
+    container_name: discourse-extractor
+    command: yarn run start:prod extractor
+
+  discourse-graph:
+    <<: [ *discourse-common ]
+    <<: [ *sm-resources-common ]
+    container_name: discourse-extractor
+    command: yarn run start:prod graph
+
+  discourse-mongo:
+    <<: [ *discourse-common ]
+    <<: [ *sm-resources-common ]
+    container_name: discourse-extractor
+    command: yarn run start:prod mongo
 
   ### AIRFLOW ###
 
