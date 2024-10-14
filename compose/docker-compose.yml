@@ -144,7 +144,7 @@ x-discourse-common: &discourse-common
     - discourse
     - production
     - monitoring
-  <<: [ *md-resources-common ]
+  <<: [ *lg-resources-common ]
 
 services:
 
