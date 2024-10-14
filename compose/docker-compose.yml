@@ -128,7 +128,7 @@ x-telegram-common: &telegram-common
 
 x-discourse-common: &discourse-common
   image: ghcr.io/togethercrew/discourse:main
-  restart: always
+  restart: unless-stopped
   env_file:
     - .env.discourse
   depends_on:
