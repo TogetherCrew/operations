@@ -75,3 +75,10 @@ echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
 - Install [neo4j-migrations](https://michael-simons.github.io/neo4j-migrations/2.2.2/#cli) tool
 - Create a file `.migrations.properties` under the db folder for neo4j based on `.migrations.properties.example`
 - run the `neo4j-migrations apply` within `db` directory (the directory containing the `.migrations.properties`) to run neo4j migrations
+
+## Running MongoDB migrations
+
+- Install [mongodb-migrations](https://pypi.org/project/mongodb-migrations/) tool
+- Change directory to `db/mongo`
+- Create a `config.ini` file based on the `config.ini.example`
+- run the command `mongodb-migrate` within the directory you are in
