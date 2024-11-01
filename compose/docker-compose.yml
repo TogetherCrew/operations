@@ -350,6 +350,20 @@ services:
       - monitoring
     <<: [*md-resources-common]
 
+  event-watcher:
+    container_name: event-watcher
+    image: ghcr.io/togethercrew/event-watcher:main
+    restart: unless-stopped
+    env_file:
+      - ./.env.event-watcher
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - production
+      - monitoring
+    <<: [*sm-resources-common]
+
   discord:
     container_name: discord
     image: ghcr.io/togethercrew/discord-bot:main
