@@ -9,26 +9,26 @@ x-logging: &logging
 x-sm-resources-common: &sm-resources-common
   mem_limit: 1G
   memswap_limit: 2G
-  <<: [ *logging ]
+  <<: [*logging]
 
 x-md-resources-common: &md-resources-common
   mem_limit: 2G
   memswap_limit: 4G
-  <<: [ *logging ]
+  <<: [*logging]
 
 x-lg-resources-common: &lg-resources-common
   mem_limit: 4G
   memswap_limit: 8G
-  <<: [ *logging ]
+  <<: [*logging]
 
 x-xl-resources-common: &xl-resources-common
   mem_limit: 8G
   memswap_limit: 16G
-  <<: [ *logging ]
+  <<: [*logging]
 
 x-redis-healthcheck: &redis-healthcheck
   healthcheck:
-    test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
     interval: 60s
     timeout: 10s
     retries: 2
@@ -52,7 +52,7 @@ x-mongodb-healthcheck: &mongodb-healthcheck
 
 x-neo4j-healthcheck: &neo4j-healthcheck
   healthcheck:
-    test: [ "CMD", "wget", "http://localhost:7474" ]
+    test: ["CMD", "wget", "http://localhost:7474"]
     interval: 1m30s
     timeout: 10s
     retries: 2
@@ -61,11 +61,11 @@ x-neo4j-healthcheck: &neo4j-healthcheck
 x-redis: &redis
   image: redis:7.2.4
   restart: unless-stopped
-  command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+  command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
   networks:
     - production
     - monitoring
-  <<: [ *redis-healthcheck, *lg-resources-common ]
+  <<: [*redis-healthcheck, *lg-resources-common]
 
 x-airflow-common: &airflow-common
   image: ghcr.io/togethercrew/airflow-dags:main
@@ -124,7 +124,7 @@ x-telegram-common: &telegram-common
   networks:
     - production
     - monitoring
-  <<: [ *md-resources-common ]
+  <<: [*md-resources-common]
 
 x-discourse-common: &discourse-common
   image: ghcr.io/togethercrew/discourse:main
@@ -144,10 +144,9 @@ x-discourse-common: &discourse-common
     - discourse
     - production
     - monitoring
-  <<: [ *lg-resources-common ]
+  <<: [*lg-resources-common]
 
 services:
-
   ### ROUTING ###
 
   nginx:
@@ -167,7 +166,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   ## DATABASES ###
 
@@ -175,13 +174,7 @@ services:
     container_name: mongodb
     image: mongo:7.0.5
     restart: unless-stopped
-    command:
-      [
-        '--replSet',
-        'rs0',
-        '--keyFile',
-        '/etc/mongo/replica.key'
-      ]
+    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo/replica.key"]
     ports:
       - 37017:27017
     env_file:
@@ -194,7 +187,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *mongodb-healthcheck, *md-resources-common ]
+    <<: [*mongodb-healthcheck, *md-resources-common]
 
   rabbitmq:
     container_name: rabbitmq
@@ -211,7 +204,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *rabbitmq-healthcheck, *md-resources-common ]
+    <<: [*rabbitmq-healthcheck, *md-resources-common]
 
   neo4j:
     container_name: neo4j
@@ -236,7 +229,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *neo4j-healthcheck, *xl-resources-common ]
+    <<: [*neo4j-healthcheck, *xl-resources-common]
 
   pgvector:
     container_name: pgvector
@@ -255,7 +248,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *md-resources-common ]
+    <<: [*md-resources-common]
 
   qdrant:
     container_name: qdrant
@@ -270,66 +263,60 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *lg-resources-common ]
+    <<: [*lg-resources-common]
 
   qdrant-healthcheck:
     container_name: qdrant-healthcheck
     restart: always
     image: curlimages/curl:latest
-    entrypoint:
-      [
-        "/bin/sh",
-        "-c",
-        "--",
-        "while true; do sleep 30; done;"
-      ]
+    entrypoint: ["/bin/sh", "-c", "--", "while true; do sleep 30; done;"]
     depends_on:
       - qdrant
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://qdrant:6333/readyz" ]
+      test: ["CMD", "curl", "-f", "http://qdrant:6333/readyz"]
       interval: 10s
       timeout: 2s
       retries: 5
     networks:
       - production
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   redis-discord:
     container_name: redis-discord
     volumes:
       - ./redis/discord.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [ *redis ]
+    <<: [*redis]
 
   redis-analyzer:
     container_name: redis-analyzer
     volumes:
       - ./redis/analyzer.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [ *redis ]
+    <<: [*redis]
 
   redis-api:
     container_name: redis-api
     volumes:
       - ./redis/api.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [ *redis ]
+    <<: [*redis]
 
   redis-discourse:
     container_name: redis-discourse
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [ *redis ]
+    <<: [*redis]
 
   redis-airflow:
     container_name: redis-airflow
     volumes:
       - ./redis/airflow.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [ *redis ]
+    <<: [*redis]
 
   redis-cadvisor:
     container_name: redis-cadvisor
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [ *redis ]
+    <<: [*redis]
 
   ### SERVICES ###
 
@@ -353,7 +340,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*md-resources-common]
 
   discord:
     container_name: discord
@@ -373,7 +360,41 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *lg-resources-common ]
+    <<: [*lg-resources-common]
+
+  discord-bot:
+    container_name: discord-bot
+    image: ghcr.io/togethercrew/discord-bot-bot:main
+    restart: unless-stopped
+    env_file:
+      - ./.env.discord-bot
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis-discord:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - production
+      - monitoring
+    <<: [*lg-resources-common]
+
+  discord-hivemind-adapter:
+    container_name: discord-hivemind-adapter
+    image: ghcr.io/togethercrew/discord-bot-hivemind-adapter:main
+    restart: unless-stopped
+    env_file:
+      - ./.env.discord-hivemind-adapter
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - production
+      - monitoring
+    <<: [*lg-resources-common]
 
   # analyzer-server:
   #   container_name: analyzer-server
@@ -414,34 +435,28 @@ services:
   #   <<: [ *xl-resources-common ]
 
   discourse-extractor:
-    <<: [ *discourse-common ]
+    <<: [*discourse-common]
     container_name: discourse-extractor
-    command: [ "node", "dist/apps/extractor/main" ]
+    command: ["node", "dist/apps/extractor/main"]
 
   discourse-graph:
-    <<: [ *discourse-common ]
+    <<: [*discourse-common]
     container_name: discourse-graph
-    command: [ "node", "dist/apps/graph/main" ]
+    command: ["node", "dist/apps/graph/main"]
 
   discourse-mongo:
-    <<: [ *discourse-common ]
+    <<: [*discourse-common]
     container_name: discourse-mongo
-    command: [ "node", "dist/apps/mongo/main" ]
+    command: ["node", "dist/apps/mongo/main"]
 
   ### AIRFLOW ###
 
   airflow-webserver:
     container_name: airflow-webserver
-    <<: [ *airflow-common, *lg-resources-common ]
+    <<: [*airflow-common, *lg-resources-common]
     command: webserver
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "--fail",
-          "http://localhost:8080/health"
-        ]
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -453,16 +468,10 @@ services:
 
   airflow-scheduler:
     container_name: airflow-scheduler
-    <<: [ *airflow-common, *lg-resources-common ]
+    <<: [*airflow-common, *lg-resources-common]
     command: scheduler
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "--fail",
-          "http://localhost:8974/health"
-        ]
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -474,7 +483,7 @@ services:
 
   airflow-worker:
     container_name: airflow-worker
-    <<: [ *airflow-common, *xl-resources-common ]
+    <<: [*airflow-common, *xl-resources-common]
     command: celery worker
     healthcheck:
       # yamllint disable rule:line-length
@@ -496,13 +505,13 @@ services:
 
   airflow-triggerer:
     container_name: airflow-triggerer
-    <<: [ *airflow-common, *lg-resources-common ]
+    <<: [*airflow-common, *lg-resources-common]
     command: triggerer
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"'
+          'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"',
         ]
       interval: 30s
       timeout: 10s
@@ -516,7 +525,7 @@ services:
   airflow-init:
     container_name: airflow-init
     restart: "no"
-    <<: [ *airflow-common, *lg-resources-common ]
+    <<: [*airflow-common, *lg-resources-common]
     entrypoint: /bin/bash
     command: -c "./init.sh"
     env_file:
@@ -529,7 +538,7 @@ services:
   airflow-cli:
     container_name: airflow-cli
     restart: "no"
-    <<: [ *airflow-common, *xl-resources-common ]
+    <<: [*airflow-common, *xl-resources-common]
     profiles:
       - debug
     environment:
@@ -542,14 +551,14 @@ services:
   # See: https://docs.docker.com/compose/profiles/
   flower:
     container_name: flower
-    <<: [ *airflow-common, *lg-resources-common ]
+    <<: [*airflow-common, *lg-resources-common]
     command: celery flower
     profiles:
       - flower
     ports:
       - "5555:5555"
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://localhost:5555/" ]
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -562,12 +571,12 @@ services:
 
   hivemind-server:
     container_name: hivemind-server
-    <<: [ *hivemind-common, *sm-resources-common ]
+    <<: [*hivemind-common, *sm-resources-common]
     command: fastapi run
 
   hivemind-worker:
     # container_name: hivemind-worker
-    <<: [ *hivemind-common, *xl-resources-common ]
+    <<: [*hivemind-common, *xl-resources-common]
     deploy:
       mode: replicated
       replicas: 3
@@ -575,31 +584,31 @@ services:
     ### TELEGRAM
 
   telegram-bot:
-    <<: [ *telegram-common ]
+    <<: [*telegram-common]
     container_name: telegram-bot
-    command: [ "node", "dist/apps/bot/main" ]
+    command: ["node", "dist/apps/bot/main"]
 
   telegram-events:
-    <<: [ *telegram-common ]
+    <<: [*telegram-common]
     container_name: telegram-events
-    command: [ "node", "dist/apps/event-store/main" ]
+    command: ["node", "dist/apps/event-store/main"]
 
   telegram-graph:
-    <<: [ *telegram-common ]
+    <<: [*telegram-common]
     container_name: telegram-graph
-    command: [ "node", "dist/apps/graph-store/main" ]
+    command: ["node", "dist/apps/graph-store/main"]
 
   telegram-question:
-    <<: [ *telegram-common ]
+    <<: [*telegram-common]
     container_name: telegram-question
-    command: [ "node", "dist/apps/question/main" ]
+    command: ["node", "dist/apps/question/main"]
 
   question-service:
     image: ghcr.io/togethercrew/question-service:main
     container_name: question-service
     # command: ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
     platform: linux/x86_64
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
     networks:
       - production
       - monitoring
@@ -620,7 +629,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *md-resources-common ]
+    <<: [*md-resources-common]
 
   ### MONITORING
 
@@ -636,7 +645,7 @@ services:
       - loki
     networks:
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   prometheus:
     container_name: prometheus
@@ -652,7 +661,7 @@ services:
       - node-exporter
     networks:
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   cadvisor:
     container_name: cadvisor
@@ -667,7 +676,7 @@ services:
       - redis-cadvisor
     networks:
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   loki:
     container_name: loki
@@ -694,30 +703,30 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     networks:
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   otel-collector:
     container_name: otel-collector
     image: otel/opentelemetry-collector:0.92.0
-    command: [ "--config=/etc/otel-collector.yaml" ]
+    command: ["--config=/etc/otel-collector.yaml"]
     restart: unless-stopped
     volumes:
       - ./otel-collector/otel-collector.yaml:/etc/otel-collector.yaml
     networks:
       - monitoring
       - production
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   tempo:
     container_name: tempo
     image: grafana/tempo:2.3.1
-    command: [ "-config.file=/etc/tempo.yaml" ]
+    command: ["-config.file=/etc/tempo.yaml"]
     restart: unless-stopped
     volumes:
       - ./tempo/tempo.yaml:/etc/tempo.yaml
@@ -725,7 +734,7 @@ services:
     networks:
       - monitoring
       - production
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   pyroscope:
     container_name: pyroscope
@@ -734,7 +743,7 @@ services:
     networks:
       - monitoring
       - production
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
   ### SERVICE MANAGEMENT ###
 
   watchtower:
@@ -743,12 +752,12 @@ services:
     command: --interval 60 --http-api-metrics --http-api-token demotoken -d
     restart: unless-stopped
     env_file:
-    - ./.env.watchtower
+      - ./.env.watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
 volumes:
   mongodb_data_container:
@@ -767,7 +776,6 @@ volumes:
   tempo_data:
   qdrant_data:
   qdrant_snapshots:
-
 
 networks:
   production:
