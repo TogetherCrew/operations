@@ -23,6 +23,7 @@ map $host $backend {
     rabbitmq.${DOMAIN}      http://rabbitmq:15672;
     admin.${DOMAIN}         http://admin-panel:8501;
     qdrant.${DOMAIN}        http://qdrant:6333;
+    hivemind.${DOMAIN}      http://hivemind-server:8000;
 }
 
 # websockets
