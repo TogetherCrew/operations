@@ -105,6 +105,8 @@ x-hivemind-common: &hivemind-common
       condition: service_healthy
     pgvector:
       condition: service_healthy
+    redis-hivemind:
+      condition: service_healthy
   networks:
     - production
     - monitoring
@@ -314,6 +316,12 @@ services:
 
   redis-cadvisor:
     container_name: redis-cadvisor
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    <<: [*redis]
+
+  redis-hivemind:
+    container_name: redis-hivemind
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     <<: [*redis]
