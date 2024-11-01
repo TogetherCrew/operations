@@ -563,7 +563,7 @@ services:
   hivemind-server:
     container_name: hivemind-server
     <<: [ *hivemind-common, *sm-resources-common ]
-    command: python3 server.py
+    command: fastapi run
 
   hivemind-worker:
     # container_name: hivemind-worker
