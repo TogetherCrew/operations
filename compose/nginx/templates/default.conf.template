@@ -18,7 +18,7 @@ map $host $backend {
     api.${DOMAIN}           http://api:3000;
     grafana.${DOMAIN}       http://grafana:3000;
     airflow.${DOMAIN}       http://airflow-webserver:8080;
-    discord-bot.${DOMAIN}   http://discord-bot:3000;
+    discord.${DOMAIN}       http://discord-bot:3000;
     discourse.${DOMAIN}     http://discourse-extractor:3000;
     rabbitmq.${DOMAIN}      http://rabbitmq:15672;
     admin.${DOMAIN}         http://admin-panel:8501;
