@@ -364,7 +364,6 @@ services:
       - monitoring
     <<: [*sm-resources-common]
 
-
   discord-bot:
     container_name: discord-bot
     image: ghcr.io/togethercrew/discord-bot-bot:main
@@ -399,8 +398,7 @@ services:
       - monitoring
     <<: [*sm-resources-common]
 
-
-  discord-hivemind-adapter:
+  oci-backend:
     container_name: oci-backend
     image: ghcr.io/togethercrew/oci-backend:main
     restart: unless-stopped
