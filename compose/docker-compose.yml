@@ -404,9 +404,6 @@ services:
     restart: unless-stopped
     env_file:
       - ./.env.oci-backend
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
     networks:
       - production
       - monitoring
