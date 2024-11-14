@@ -405,7 +405,7 @@ services:
     env_file:
       - ./.env.oci-backend
     ports:
-      - 3030
+      - 3000:3030
     networks:
       - production
       - monitoring
