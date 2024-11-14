@@ -404,6 +404,8 @@ services:
     restart: unless-stopped
     env_file:
       - ./.env.oci-backend
+    ports:
+      - 3000:3030
     networks:
       - production
       - monitoring

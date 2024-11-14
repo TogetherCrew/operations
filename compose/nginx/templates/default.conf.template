@@ -24,8 +24,6 @@ map $host $backend {
     admin.${DOMAIN}         http://admin-panel:8501;
     qdrant.${DOMAIN}        http://qdrant:6333;
     hivemind.${DOMAIN}      http://hivemind-server:8000;
-    oci-backend.${DOMAIN}   http://oci-backend:3000;
-
 }
 
 # websockets
