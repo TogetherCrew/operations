@@ -128,25 +128,25 @@ x-telegram-common: &telegram-common
     - monitoring
   <<: [*md-resources-common]
 
-x-discourse-common: &discourse-common
-  image: ghcr.io/togethercrew/discourse:main
-  restart: unless-stopped
-  env_file:
-    - .env.discourse
-  depends_on:
-    redis-discourse:
-      condition: service_healthy
-    rabbitmq:
-      condition: service_healthy
-    neo4j:
-      condition: service_healthy
-    mongodb:
-      condition: service_healthy
-  networks:
-    - discourse
-    - production
-    - monitoring
-  <<: [*lg-resources-common]
+# x-discourse-common: &discourse-common
+#   image: ghcr.io/togethercrew/discourse:main
+#   restart: unless-stopped
+#   env_file:
+#     - .env.discourse
+#   depends_on:
+#     redis-discourse:
+#       condition: service_healthy
+#     rabbitmq:
+#       condition: service_healthy
+#     neo4j:
+#       condition: service_healthy
+#     mongodb:
+#       condition: service_healthy
+#   networks:
+#     - discourse
+#     - production
+#     - monitoring
+#   <<: [*lg-resources-common]
 
 services:
   ### ROUTING ###
@@ -327,6 +327,12 @@ services:
       - ./redis/hivemind.conf:/usr/local/etc/redis/redis.conf:ro
     <<: [*redis]
 
+  redis-temporal-worker-typescript:
+    container_name: redis-temporal-worker-typescript
+    volumes:
+      - ./redis/redis-temporal-worker-typescript.conf:/usr/local/etc/redis/redis.conf:ro
+    <<: [*redis]
+
   ### SERVICES ###
 
   api:
@@ -477,14 +483,24 @@ services:
     networks:
       - production
       - monitoring
+    healthcheck:
+      test:
+        ["CMD","tctl","--address","temporal:7233","workflow","list"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+    <<: [ *md-resources-common ]
 
   temporal-ui:
     container_name: temporal-ui
     image: temporalio/ui:latest
     env_file: .env.temporal-ui
+    depends_on:
+      - temporal
     networks:
       - production
       - monitoring
+    <<: [ *sm-resources-common ]
 
   temporal-elasticsearch:
     container_name: temporal-elasticsearch
@@ -500,6 +516,7 @@ services:
     networks:
       - production
       - monitoring
+    <<: [ *md-resources-common ]
 
   temporal-postgresql:
     image: postgres:latest
@@ -507,6 +524,23 @@ services:
     networks:
       - production
       - monitoring
+    <<: [ *md-resources-common ]
+
+  temporal-worker-typescript:
+    container_name: temporal-worker-typescript
+    image: ghcr.io/togethercrew/temporal-worker-typescript:main
+    env_file: .env.temporal-worker-typescript
+    depends_on:
+      temporal:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      redis-temporal-worker-typescript:
+        condition: service_healthy
+    networks:
+      - production
+      - monitoring
+    <<: [ *md-resources-common ]
 
   ### AIRFLOW ###
 
