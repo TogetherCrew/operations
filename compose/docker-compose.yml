@@ -337,7 +337,7 @@ services:
 
   api:
     container_name: api
-    image: ghcr.io/togethercrew/api:main
+    image: ghcr.io/togethercrew/api:add-temporal
     restart: unless-stopped
     env_file:
       - ./.env.api
