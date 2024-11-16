@@ -18,7 +18,7 @@ map $host $backend {
     api.${DOMAIN}           http://api:3000;
     grafana.${DOMAIN}       http://grafana:3000;
     airflow.${DOMAIN}       http://airflow-webserver:8080;
-    discord.${DOMAIN}       http://discord-bot:3000;
+    # discord.${DOMAIN}       http://discord-bot:3000;
     discourse.${DOMAIN}     http://discourse-extractor:3000;
     rabbitmq.${DOMAIN}      http://rabbitmq:15672;
     admin.${DOMAIN}         http://admin-panel:8501;
@@ -37,7 +37,7 @@ server {
     server_name *.${DOMAIN};
     listen [::]:443 ssl ipv6only=on;
     listen 443 ssl;
-    
+
     location / {
         proxy_pass $backend;
         proxy_set_header Host $host;
@@ -49,8 +49,15 @@ server {
         proxy_set_header Connection $connection_upgrade;
     }
 
+}
+
+server {
+    server_name discord.${DOMAIN};
+    listen [::]:443 ssl ipv6only=on;
+    listen 443 ssl;
+
     location / {
-        proxy_pass http://discord-bot:3000
+        proxy_pass http://discord-bot:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -62,7 +69,6 @@ server {
         auth_basic "Restricted Access";
         auth_basic_user_file /etc/nginx/.htpasswd;
     }
-
 }
 
 server {

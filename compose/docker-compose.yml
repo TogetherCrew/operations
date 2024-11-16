@@ -161,7 +161,7 @@ services:
     volumes:
       - ./nginx/templates:/etc/nginx/templates:ro
       - ./nginx/ssl:/etc/ssl:ro
-      - ./nginx/htpasswd/.htpasswd:/etc/nginx/.htpasswd
+      - ./nginx/htpasswd/.htpasswd:/etc/nginx/.htpasswd:ro
     env_file:
       - ./.env.nginx
     depends_on:
