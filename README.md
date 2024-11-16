@@ -82,3 +82,11 @@ echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
 - Change directory to `db/mongo`
 - Create a `config.ini` file based on the `config.ini.example`
 - run the command `mongodb-migrate` within the directory you are in
+
+## Creating a .htpasswd file
+
+```bash
+cd /nginx/htpasswd/
+htpasswd -c .htpasswd username
+```
+
