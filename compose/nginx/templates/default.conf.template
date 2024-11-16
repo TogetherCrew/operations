@@ -19,7 +19,7 @@ map $host $backend {
     grafana.${DOMAIN}       http://grafana:3000;
     airflow.${DOMAIN}       http://airflow-webserver:8080;
     discord.${DOMAIN}       http://discord-bot:3000;
-    discourse.${DOMAIN}     http://discourse-extractor:3000;
+    temporal.${DOMAIN}      http://temporal-ui:8080;
     rabbitmq.${DOMAIN}      http://rabbitmq:15672;
     admin.${DOMAIN}         http://admin-panel:8501;
     qdrant.${DOMAIN}        http://qdrant:6333;
