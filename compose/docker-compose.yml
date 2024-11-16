@@ -450,20 +450,63 @@ services:
   #     - monitoring
   #   <<: [ *xl-resources-common ]
 
-  discourse-extractor:
-    <<: [*discourse-common]
-    container_name: discourse-extractor
-    command: ["node", "dist/apps/extractor/main"]
+  # discourse-extractor:
+  #   <<: [*discourse-common]
+  #   container_name: discourse-extractor
+  #   command: ["node", "dist/apps/extractor/main"]
 
-  discourse-graph:
-    <<: [*discourse-common]
-    container_name: discourse-graph
-    command: ["node", "dist/apps/graph/main"]
+  # discourse-graph:
+  #   <<: [*discourse-common]
+  #   container_name: discourse-graph
+  #   command: ["node", "dist/apps/graph/main"]
 
-  discourse-mongo:
-    <<: [*discourse-common]
-    container_name: discourse-mongo
-    command: ["node", "dist/apps/mongo/main"]
+  # discourse-mongo:
+  #   <<: [*discourse-common]
+  #   container_name: discourse-mongo
+  #   command: ["node", "dist/apps/mongo/main"]
+
+  ### TEMPORAL ###
+
+  temporal:
+    container_name: temporal
+    image: temporalio/auto-setup:latest
+    depends_on:
+      - temporal-postgresql
+      - temporal-elasticsearch
+    env_file: .env.temporal
+    networks:
+      - production
+      - monitoring
+
+  temporal-ui:
+    container_name: temporal-ui
+    image: temporalio/ui:latest
+    env_file: .env.temporal-ui
+    networks:
+      - production
+      - monitoring
+
+  temporal-elasticsearch:
+    container_name: temporal-elasticsearch
+    image: elasticsearch:8.16.0
+    environment:
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.low=512mb
+      - cluster.routing.allocation.disk.watermark.high=256mb
+      - cluster.routing.allocation.disk.watermark.flood_stage=128mb
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+      - xpack.security.enabled=false
+    networks:
+      - production
+      - monitoring
+
+  temporal-postgresql:
+    image: postgres:latest
+    env_file: .env.temporal-postgresql
+    networks:
+      - production
+      - monitoring
 
   ### AIRFLOW ###
 
