@@ -337,7 +337,7 @@ services:
 
   api:
     container_name: api
-    image: ghcr.io/togethercrew/api:add-temporal
+    image: ghcr.io/togethercrew/api:main
     restart: unless-stopped
     env_file:
       - ./.env.api
@@ -484,12 +484,11 @@ services:
       - production
       - monitoring
     healthcheck:
-      test:
-        ["CMD","tctl","--address","temporal:7233","workflow","list"]
+      test: ["CMD", "tctl", "--address", "temporal:7233", "workflow", "list"]
       interval: 1s
       timeout: 5s
       retries: 30
-    <<: [ *md-resources-common ]
+    <<: [*md-resources-common]
 
   temporal-ui:
     container_name: temporal-ui
@@ -500,7 +499,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *sm-resources-common ]
+    <<: [*sm-resources-common]
 
   temporal-elasticsearch:
     container_name: temporal-elasticsearch
@@ -516,7 +515,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *md-resources-common ]
+    <<: [*md-resources-common]
 
   temporal-postgresql:
     image: postgres:latest
@@ -524,7 +523,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *md-resources-common ]
+    <<: [*md-resources-common]
 
   temporal-worker-typescript:
     container_name: temporal-worker-typescript
@@ -540,7 +539,7 @@ services:
     networks:
       - production
       - monitoring
-    <<: [ *md-resources-common ]
+    <<: [*md-resources-common]
 
   ### AIRFLOW ###
 
