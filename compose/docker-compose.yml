@@ -520,6 +520,7 @@ services:
     <<: [*md-resources-common]
 
   temporal-postgresql:
+    container_name: temporal-postgresql
     image: postgres:12.22
     env_file: .env.temporal-postgresql
     networks:
