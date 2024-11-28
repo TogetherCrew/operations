@@ -512,6 +512,8 @@ services:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms256m -Xmx256m
       - xpack.security.enabled=false
+    volumes:
+      - temporal_elasticsearch_data:/var/lib/elasticsearch/data
     networks:
       - production
       - monitoring
@@ -523,6 +525,8 @@ services:
     networks:
       - production
       - monitoring
+    volumes:
+      - temporal_postgresql_data:/var/lib/postgresql/data
     <<: [*md-resources-common]
 
   temporal-worker-typescript-heavy:
@@ -869,6 +873,8 @@ volumes:
   tempo_data:
   qdrant_data:
   qdrant_snapshots:
+  temporal_postgresql_data:
+  temporal_elasticsearch_data:
 
 networks:
   production:
