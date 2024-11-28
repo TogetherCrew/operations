@@ -153,7 +153,7 @@ services:
 
   nginx:
     container_name: nginx
-    image: nginx:latest
+    image: nginx:1.27.3
     restart: unless-stopped
     ports:
       - 80:80
@@ -271,7 +271,7 @@ services:
   qdrant-healthcheck:
     container_name: qdrant-healthcheck
     restart: always
-    image: curlimages/curl:latest
+    image: curlimages/curl:8.11.0
     entrypoint: ["/bin/sh", "-c", "--", "while true; do sleep 30; done;"]
     depends_on:
       - qdrant
@@ -475,7 +475,7 @@ services:
 
   temporal:
     container_name: temporal
-    image: temporalio/auto-setup:latest
+    image: temporalio/auto-setup:1.25.2
     depends_on:
       - temporal-postgresql
       - temporal-elasticsearch
@@ -492,7 +492,7 @@ services:
 
   temporal-ui:
     container_name: temporal-ui
-    image: temporalio/ui:latest
+    image: temporalio/ui:2.32.0
     env_file: .env.temporal-ui
     depends_on:
       - temporal
@@ -518,7 +518,7 @@ services:
     <<: [*md-resources-common]
 
   temporal-postgresql:
-    image: postgres:latest
+    image: postgres:12.22
     env_file: .env.temporal-postgresql
     networks:
       - production
