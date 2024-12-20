@@ -684,6 +684,7 @@ services:
   telegram-bot:
     <<: [*telegram-common]
     container_name: telegram-bot
+    platform: linux/x86_64
     command: ["node", "dist/apps/bot/main"]
 
   telegram-events:
