@@ -686,21 +686,6 @@ services:
     container_name: telegram-bot
     command: ["node", "dist/apps/bot/main"]
 
-  telegram-events:
-    <<: [*telegram-common]
-    container_name: telegram-events
-    command: ["node", "dist/apps/event-store/main"]
-
-  telegram-graph:
-    <<: [*telegram-common]
-    container_name: telegram-graph
-    command: ["node", "dist/apps/graph-store/main"]
-
-  telegram-question:
-    <<: [*telegram-common]
-    container_name: telegram-question
-    command: ["node", "dist/apps/question/main"]
-
   question-service:
     image: ghcr.io/togethercrew/question-service:main
     container_name: question-service
