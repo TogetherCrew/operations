@@ -119,9 +119,7 @@ x-telegram-common: &telegram-common
   depends_on:
     rabbitmq:
       condition: service_healthy
-    neo4j:
-      condition: service_healthy
-    mongodb:
+    temporal:
       condition: service_healthy
   networks:
     - production
@@ -684,7 +682,7 @@ services:
   telegram-bot:
     <<: [*telegram-common]
     container_name: telegram-bot
-    command: ["node", "dist/apps/bot/main"]
+    # command: ["node", "dist/apps/bot/main"]
 
   question-service:
     image: ghcr.io/togethercrew/question-service:main
