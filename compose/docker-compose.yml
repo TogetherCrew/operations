@@ -548,13 +548,11 @@ services:
     <<: [*md-resources-common]
 
   temporal-worker-typescript-heavy:
-    container_name: temporal-worker-typescript-heavy
     <<: [*temporal-worker-typescript]
     environment:
       - QUEUE=TEMPORAL_QUEUE_HEAVY
 
   temporal-worker-typescript-light:
-    container_name: temporal-worker-typescript-light
     <<: [*temporal-worker-typescript]
     environment:
       - QUEUE=TEMPORAL_QUEUE_LIGHT
