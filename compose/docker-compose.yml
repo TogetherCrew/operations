@@ -126,6 +126,22 @@ x-telegram-common: &telegram-common
     - monitoring
   <<: [*md-resources-common]
 
+  x-temporal-worker-typescript: &temporal-worker-typescript
+    image: ghcr.io/togethercrew/temporal-worker-typescript:main
+    restart: unless-stopped
+    env_file: .env.temporal-worker-typescript
+    depends_on:
+      temporal:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      redis-temporal-worker-typescript:
+        condition: service_healthy
+    networks:
+      - production
+      - monitoring
+    <<: [*lg-resources-common]
+
 # x-discourse-common: &discourse-common
 #   image: ghcr.io/togethercrew/discourse:main
 #   restart: unless-stopped
@@ -529,21 +545,16 @@ services:
     <<: [*md-resources-common]
 
   temporal-worker-typescript-heavy:
-    container_name: temporal-worker-typescript
-    image: ghcr.io/togethercrew/temporal-worker-typescript:main
-    restart: unless-stopped
-    env_file: .env.temporal-worker-typescript
-    depends_on:
-      temporal:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-      redis-temporal-worker-typescript:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    <<: [*lg-resources-common]
+    container_name: temporal-worker-typescript-heavy
+    <<: [*temporal-worker-typescript]
+    environment:
+      - QUEUE=TEMPORAL_QUEUE_HEAVY
+
+  temporal-worker-typescript-light:
+    container_name: temporal-worker-typescript-light
+    <<: [*temporal-worker-typescript]
+    environment:
+      - QUEUE=TEMPORAL_QUEUE_HEAVY
 
   ### AIRFLOW ###
 
