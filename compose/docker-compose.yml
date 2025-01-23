@@ -554,7 +554,7 @@ services:
     container_name: temporal-worker-typescript-light
     <<: [*temporal-worker-typescript]
     environment:
-      - QUEUE=TEMPORAL_QUEUE_HEAVY
+      - QUEUE=TEMPORAL_QUEUE_LIGHT
 
   ### AIRFLOW ###
 
