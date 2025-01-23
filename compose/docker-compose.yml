@@ -140,6 +140,9 @@ x-telegram-common: &telegram-common
     networks:
       - production
       - monitoring
+    deploy:
+      mode: replicated
+      replicas: 3
     <<: [*lg-resources-common]
 
 # x-discourse-common: &discourse-common
