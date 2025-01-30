@@ -145,6 +145,26 @@ x-telegram-common: &telegram-common
       replicas: 3
     <<: [*lg-resources-common]
 
+  x-temporal-worker-python: &temporal-worker-python
+    image: ghcr.io/togethercrew/temporal-worker-python:main
+    restart: unless-stopped
+    env_file: .env.temporal-worker-python
+    depends_on:
+      temporal:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      redis-temporal-worker-python:
+        condition: service_healthy
+    networks:
+      - production
+      - monitoring
+    deploy:
+      mode: replicated
+      replicas: 3
+    <<: [*lg-resources-common]
+
+
 # x-discourse-common: &discourse-common
 #   image: ghcr.io/togethercrew/discourse:main
 #   restart: unless-stopped
@@ -348,6 +368,12 @@ services:
     container_name: redis-temporal-worker-typescript
     volumes:
       - ./redis/redis-temporal-worker-typescript.conf:/usr/local/etc/redis/redis.conf:ro
+    <<: [*redis]
+
+  redis-temporal-worker-python:
+    container_name: redis-temporal-worker-python
+    volumes:
+      - ./redis/redis-temporal-worker-python.conf:/usr/local/etc/redis/redis.conf:ro
     <<: [*redis]
 
   ### SERVICES ###
@@ -556,6 +582,16 @@ services:
     <<: [*temporal-worker-typescript]
     environment:
       - QUEUE=TEMPORAL_QUEUE_LIGHT
+
+  temporal-worker-python-heavy:
+    <<: [*temporal-worker-python]
+    environment:
+      - TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
+
+  temporal-worker-python-light:
+    <<: [*temporal-worker-python]
+    environment:
+      - TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_LIGHT
 
   ### AIRFLOW ###
 
