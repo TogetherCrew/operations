@@ -586,12 +586,12 @@ services:
   temporal-worker-python-heavy:
     <<: [*temporal-worker-python]
     environment:
-      - TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
+      - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
 
   temporal-worker-python-light:
     <<: [*temporal-worker-python]
     environment:
-      - TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_LIGHT
+      - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_LIGHT
 
   ### AIRFLOW ###
 
