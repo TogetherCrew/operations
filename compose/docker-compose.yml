@@ -1,169 +1,168 @@
 x-logging: &logging
-  logging:
-    driver: loki
-    options:
-      loki-url: http://172.22.0.15:3100/loki/api/v1/push
-      loki-retries: 5
-      loki-batch-size: 400
+    logging:
+        driver: loki
+        options:
+            loki-url: http://172.22.0.15:3100/loki/api/v1/push
+            loki-retries: 5
+            loki-batch-size: 400
 
 x-sm-resources-common: &sm-resources-common
-  mem_limit: 1G
-  memswap_limit: 2G
-  <<: [*logging]
+    mem_limit: 1G
+    memswap_limit: 2G
+    <<: [*logging]
 
 x-md-resources-common: &md-resources-common
-  mem_limit: 2G
-  memswap_limit: 4G
-  <<: [*logging]
+    mem_limit: 2G
+    memswap_limit: 4G
+    <<: [*logging]
 
 x-lg-resources-common: &lg-resources-common
-  mem_limit: 4G
-  memswap_limit: 8G
-  <<: [*logging]
+    mem_limit: 4G
+    memswap_limit: 8G
+    <<: [*logging]
 
 x-xl-resources-common: &xl-resources-common
-  mem_limit: 8G
-  memswap_limit: 16G
-  <<: [*logging]
+    mem_limit: 8G
+    memswap_limit: 16G
+    <<: [*logging]
 
 x-redis-healthcheck: &redis-healthcheck
-  healthcheck:
-    test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-    interval: 60s
-    timeout: 10s
-    retries: 2
-    start_period: 40s
+    healthcheck:
+        test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+        interval: 60s
+        timeout: 10s
+        retries: 2
+        start_period: 40s
 
 x-rabbitmq-healthcheck: &rabbitmq-healthcheck
-  healthcheck:
-    test: rabbitmq-diagnostics -q ping
-    interval: 30s
-    timeout: 30s
-    retries: 2
-    start_period: 40s
+    healthcheck:
+        test: rabbitmq-diagnostics -q ping
+        interval: 30s
+        timeout: 30s
+        retries: 2
+        start_period: 40s
 
 x-mongodb-healthcheck: &mongodb-healthcheck
-  healthcheck:
-    test: test $(echo $(mongosh -u $$MONGO_INITDB_ROOT_USERNAME -p $$MONGO_INITDB_ROOT_PASSWORD --quiet /etc/mongo/healthcheck.js)) -eq 1
-    interval: 60s
-    timeout: 10s
-    retries: 2
-    start_period: 40s
+    healthcheck:
+        test: test $(echo $(mongosh -u $$MONGO_INITDB_ROOT_USERNAME -p $$MONGO_INITDB_ROOT_PASSWORD --quiet /etc/mongo/healthcheck.js)) -eq 1
+        interval: 60s
+        timeout: 10s
+        retries: 2
+        start_period: 40s
 
 x-neo4j-healthcheck: &neo4j-healthcheck
-  healthcheck:
-    test: ["CMD", "wget", "http://localhost:7474"]
-    interval: 1m30s
-    timeout: 10s
-    retries: 2
-    start_period: 40s
+    healthcheck:
+        test: ['CMD', 'wget', 'http://localhost:7474']
+        interval: 1m30s
+        timeout: 10s
+        retries: 2
+        start_period: 40s
 
 x-redis: &redis
-  image: redis:7.2.4
-  restart: unless-stopped
-  command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
-  networks:
-    - production
-    - monitoring
-  <<: [*redis-healthcheck, *lg-resources-common]
+    image: redis:7.2.4
+    restart: unless-stopped
+    command: ['redis-server', '/usr/local/etc/redis/redis.conf']
+    networks:
+        - production
+        - monitoring
+    <<: [*redis-healthcheck, *lg-resources-common]
 
 x-airflow-common: &airflow-common
-  image: ghcr.io/togethercrew/airflow-dags:main
-  restart: unless-stopped
-  env_file:
-    - ./.env.airflow
-  volumes:
-    - airflow_logs:/opt/airflow/logs
-    - airflow_config:/opt/airflow/config
-    - airflow_plugins:/opt/airflow/plugins
-  user: "50000:0"
-  depends_on: &airflow-common-depends-on
-    redis-airflow:
-      condition: service_healthy
-    pgvector:
-      condition: service_healthy
-    neo4j:
-      condition: service_healthy
-    mongodb:
-      condition: service_healthy
-    qdrant-healthcheck:
-      condition: service_healthy
-  networks:
-    - production
-    - monitoring
-  # <<: [ *lg-resources-common ]
+    image: ghcr.io/togethercrew/airflow-dags:main
+    restart: unless-stopped
+    env_file:
+        - ./.env.airflow
+    volumes:
+        - airflow_logs:/opt/airflow/logs
+        - airflow_config:/opt/airflow/config
+        - airflow_plugins:/opt/airflow/plugins
+    user: '50000:0'
+    depends_on: &airflow-common-depends-on
+        redis-airflow:
+            condition: service_healthy
+        pgvector:
+            condition: service_healthy
+        neo4j:
+            condition: service_healthy
+        mongodb:
+            condition: service_healthy
+        qdrant-healthcheck:
+            condition: service_healthy
+    networks:
+        - production
+        - monitoring
+    # <<: [ *lg-resources-common ]
 
 x-hivemind-common: &hivemind-common
-  image: ghcr.io/togethercrew/hivemind-bot:main
-  restart: unless-stopped
-  env_file:
-    - ./.env.hivemind
-  depends_on: &hivemind-common-depends-on
-    neo4j:
-      condition: service_healthy
-    mongodb:
-      condition: service_healthy
-    pgvector:
-      condition: service_healthy
-    redis-hivemind:
-      condition: service_healthy
-  networks:
-    - production
-    - monitoring
+    image: ghcr.io/togethercrew/hivemind-bot:main
+    restart: unless-stopped
+    env_file:
+        - ./.env.hivemind
+    depends_on: &hivemind-common-depends-on
+        neo4j:
+            condition: service_healthy
+        mongodb:
+            condition: service_healthy
+        pgvector:
+            condition: service_healthy
+        redis-hivemind:
+            condition: service_healthy
+    networks:
+        - production
+        - monitoring
 
 x-telegram-common: &telegram-common
-  image: ghcr.io/togethercrew/telegram:main
-  restart: unless-stopped
-  env_file:
-    - ./.env.telegram
-  depends_on:
-    rabbitmq:
-      condition: service_healthy
-    temporal:
-      condition: service_healthy
-  networks:
-    - production
-    - monitoring
-  <<: [*md-resources-common]
-
-  x-temporal-worker-typescript: &temporal-worker-typescript
-    image: ghcr.io/togethercrew/temporal-worker-typescript:main
+    image: ghcr.io/togethercrew/telegram:main
     restart: unless-stopped
-    env_file: .env.temporal-worker-typescript
+    env_file:
+        - ./.env.telegram
     depends_on:
-      temporal:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-      redis-temporal-worker-typescript:
-        condition: service_healthy
+        rabbitmq:
+            condition: service_healthy
+        temporal:
+            condition: service_healthy
     networks:
-      - production
-      - monitoring
-    deploy:
-      mode: replicated
-      replicas: 3
-    <<: [*lg-resources-common]
+        - production
+        - monitoring
+    <<: [*md-resources-common]
 
-  x-temporal-worker-python: &temporal-worker-python
-    image: ghcr.io/togethercrew/temporal-worker-python:main
-    restart: unless-stopped
-    env_file: .env.temporal-worker-python
-    depends_on:
-      temporal:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-      redis-temporal-worker-python:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    deploy:
-      mode: replicated
-      replicas: 3
-    <<: [*lg-resources-common]
+    x-temporal-worker-typescript: &temporal-worker-typescript
+        image: ghcr.io/togethercrew/temporal-worker-typescript:main
+        restart: unless-stopped
+        env_file: .env.temporal-worker-typescript
+        depends_on:
+            temporal:
+                condition: service_healthy
+            neo4j:
+                condition: service_healthy
+            redis-temporal-worker-typescript:
+                condition: service_healthy
+        networks:
+            - production
+            - monitoring
+        deploy:
+            mode: replicated
+            replicas: 3
+        <<: [*lg-resources-common]
 
+    x-temporal-worker-python: &temporal-worker-python
+        image: ghcr.io/togethercrew/temporal-worker-python:main
+        restart: unless-stopped
+        env_file: .env.temporal-worker-python
+        depends_on:
+            temporal:
+                condition: service_healthy
+            neo4j:
+                condition: service_healthy
+            redis-temporal-worker-python:
+                condition: service_healthy
+        networks:
+            - production
+            - monitoring
+        deploy:
+            mode: replicated
+            replicas: 3
+        <<: [*lg-resources-common]
 
 # x-discourse-common: &discourse-common
 #   image: ghcr.io/togethercrew/discourse:main
@@ -186,737 +185,753 @@ x-telegram-common: &telegram-common
 #   <<: [*lg-resources-common]
 
 services:
-  ### ROUTING ###
+    ### ROUTING ###
 
-  nginx:
-    container_name: nginx
-    image: nginx:1.27.3
-    restart: unless-stopped
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./nginx/templates:/etc/nginx/templates:ro
-      - ./nginx/ssl:/etc/ssl:ro
-      - ./nginx/htpasswd/.htpasswd:/etc/nginx/.htpasswd:ro
-    env_file:
-      - ./.env.nginx
-    depends_on:
-      - api
-    networks:
-      - production
-      - monitoring
-    <<: [*sm-resources-common]
+    nginx:
+        container_name: nginx
+        image: nginx:1.27.3
+        restart: unless-stopped
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./nginx/templates:/etc/nginx/templates:ro
+            - ./nginx/ssl:/etc/ssl:ro
+            - ./nginx/htpasswd/.htpasswd:/etc/nginx/.htpasswd:ro
+        env_file:
+            - ./.env.nginx
+        depends_on:
+            - api
+        networks:
+            - production
+            - monitoring
+        <<: [*sm-resources-common]
 
-  ## DATABASES ###
+    ## DATABASES ###
 
-  mongodb:
-    container_name: mongodb
-    image: mongo:7.0.5
-    restart: unless-stopped
-    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo/replica.key"]
-    ports:
-      - 37017:27017
-    env_file:
-      - ./.env.mongodb
-    volumes:
-      - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
-      - ./mongo/healthcheck.js:/etc/mongo/healthcheck.js:ro
-      - ./mongo/replica.key:/etc/mongo/replica.key:ro
-      - mongodb_data_container:/data/db
-    networks:
-      - production
-      - monitoring
-    <<: [*mongodb-healthcheck, *md-resources-common]
+    mongodb:
+        container_name: mongodb
+        image: mongo:7.0.5
+        restart: unless-stopped
+        command: ['--replSet', 'rs0', '--keyFile', '/etc/mongo/replica.key']
+        ports:
+            - 37017:27017
+        env_file:
+            - ./.env.mongodb
+        volumes:
+            - ./mongo/init.js:/docker-entrypoint-initdb.d/init.js:ro
+            - ./mongo/healthcheck.js:/etc/mongo/healthcheck.js:ro
+            - ./mongo/replica.key:/etc/mongo/replica.key:ro
+            - mongodb_data_container:/data/db
+        networks:
+            - production
+            - monitoring
+        <<: [*mongodb-healthcheck, *md-resources-common]
 
-  rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:3.12.12-management
-    restart: unless-stopped
-    ports:
-      - 6672:5672
-      # - 25672:15672
-    volumes:
-      - rmq_data_container:/var/lib/rabbitmq/
-      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
-    env_file:
-      - ./.env.rabbitmq
-    networks:
-      - production
-      - monitoring
-    <<: [*rabbitmq-healthcheck, *md-resources-common]
+    rabbitmq:
+        container_name: rabbitmq
+        image: rabbitmq:3.12.12-management
+        restart: unless-stopped
+        ports:
+            - 6672:5672
+            # - 25672:15672
+        volumes:
+            - rmq_data_container:/var/lib/rabbitmq/
+            - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+        env_file:
+            - ./.env.rabbitmq
+        networks:
+            - production
+            - monitoring
+        <<: [*rabbitmq-healthcheck, *md-resources-common]
 
-  neo4j:
-    container_name: neo4j
-    image: neo4j:5.9.0
-    restart: unless-stopped
-    ports:
-      - 27474:7474
-      - 27687:7687
-    env_file:
-      - ./.env.neo4j
-    volumes:
-      # - neo4j_conf:/var/lib/neo4j/conf
-      - neo4j_data:/data
-      - neo4j_import:/import
-      - neo4j_plugins:/plugins
-    environment:
-      # Raise memory limits
-      - NEO4J_server.memory.heap.initial_size=2G
-      - NEO4J_server.memory.heap.max_size=4G
-      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
-      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
-    networks:
-      - production
-      - monitoring
-    <<: [*neo4j-healthcheck, *xl-resources-common]
+    neo4j:
+        container_name: neo4j
+        image: neo4j:5.9.0
+        restart: unless-stopped
+        ports:
+            - 27474:7474
+            - 27687:7687
+        env_file:
+            - ./.env.neo4j
+        volumes:
+            # - neo4j_conf:/var/lib/neo4j/conf
+            - neo4j_data:/data
+            - neo4j_import:/import
+            - neo4j_plugins:/plugins
+        environment:
+            # Raise memory limits
+            - NEO4J_server.memory.heap.initial_size=2G
+            - NEO4J_server.memory.heap.max_size=4G
+            - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+            - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+        networks:
+            - production
+            - monitoring
+        <<: [*neo4j-healthcheck, *xl-resources-common]
 
-  pgvector:
-    container_name: pgvector
-    image: ankane/pgvector:v0.5.1
-    ports:
-      - 45432:5432
-    env_file: ./.env.pgvector
-    volumes:
-      - pgvector_data:/var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
-      interval: 10s
-      retries: 5
-      start_period: 5s
-    restart: always
-    networks:
-      - production
-      - monitoring
-    <<: [*md-resources-common]
+    pgvector:
+        container_name: pgvector
+        image: ankane/pgvector:v0.5.1
+        ports:
+            - 45432:5432
+        env_file: ./.env.pgvector
+        volumes:
+            - pgvector_data:/var/lib/postgresql/data
+        healthcheck:
+            test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+            interval: 10s
+            retries: 5
+            start_period: 5s
+        restart: always
+        networks:
+            - production
+            - monitoring
+        <<: [*md-resources-common]
 
-  qdrant:
-    container_name: qdrant
-    image: qdrant/qdrant:v1.9.2
-    restart: always
-    # ports:
-    #   - 6333:6333
-    volumes:
-      - qdrant_data:/qdrant/storage
-      - qdrant_snapshots:/qdrant/snapshots
-      - ./qdrant/config/production.yaml:/qdrant/config/production.yaml:ro
-    networks:
-      - production
-      - monitoring
-    <<: [*lg-resources-common]
+    qdrant:
+        container_name: qdrant
+        image: qdrant/qdrant:v1.9.2
+        restart: always
+        # ports:
+        #   - 6333:6333
+        volumes:
+            - qdrant_data:/qdrant/storage
+            - qdrant_snapshots:/qdrant/snapshots
+            - ./qdrant/config/production.yaml:/qdrant/config/production.yaml:ro
+        networks:
+            - production
+            - monitoring
+        <<: [*lg-resources-common]
 
-  qdrant-healthcheck:
-    container_name: qdrant-healthcheck
-    restart: always
-    image: curlimages/curl:8.11.0
-    entrypoint: ["/bin/sh", "-c", "--", "while true; do sleep 30; done;"]
-    depends_on:
-      - qdrant
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://qdrant:6333/readyz"]
-      interval: 10s
-      timeout: 2s
-      retries: 5
-    networks:
-      - production
-      - monitoring
-    <<: [*sm-resources-common]
+    qdrant-healthcheck:
+        container_name: qdrant-healthcheck
+        restart: always
+        image: curlimages/curl:8.11.0
+        entrypoint: ['/bin/sh', '-c', '--', 'while true; do sleep 30; done;']
+        depends_on:
+            - qdrant
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://qdrant:6333/readyz']
+            interval: 10s
+            timeout: 2s
+            retries: 5
+        networks:
+            - production
+            - monitoring
+        <<: [*sm-resources-common]
 
-  redis-discord:
-    container_name: redis-discord
-    volumes:
-      - ./redis/discord.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-discord:
+        container_name: redis-discord
+        volumes:
+            - ./redis/discord.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-analyzer:
-    container_name: redis-analyzer
-    volumes:
-      - ./redis/analyzer.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-analyzer:
+        container_name: redis-analyzer
+        volumes:
+            - ./redis/analyzer.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-api:
-    container_name: redis-api
-    volumes:
-      - ./redis/api.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-api:
+        container_name: redis-api
+        volumes:
+            - ./redis/api.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-discourse:
-    container_name: redis-discourse
-    volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-discourse:
+        container_name: redis-discourse
+        volumes:
+            - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-airflow:
-    container_name: redis-airflow
-    volumes:
-      - ./redis/airflow.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-airflow:
+        container_name: redis-airflow
+        volumes:
+            - ./redis/airflow.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-cadvisor:
-    container_name: redis-cadvisor
-    volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-cadvisor:
+        container_name: redis-cadvisor
+        volumes:
+            - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-hivemind:
-    container_name: redis-hivemind
-    volumes:
-      - ./redis/hivemind.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-hivemind:
+        container_name: redis-hivemind
+        volumes:
+            - ./redis/hivemind.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-temporal-worker-typescript:
-    container_name: redis-temporal-worker-typescript
-    volumes:
-      - ./redis/redis-temporal-worker-typescript.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-temporal-worker-typescript:
+        container_name: redis-temporal-worker-typescript
+        volumes:
+            - ./redis/redis-temporal-worker-typescript.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  redis-temporal-worker-python:
-    container_name: redis-temporal-worker-python
-    volumes:
-      - ./redis/redis-temporal-worker-python.conf:/usr/local/etc/redis/redis.conf:ro
-    <<: [*redis]
+    redis-temporal-worker-python:
+        container_name: redis-temporal-worker-python
+        volumes:
+            - ./redis/redis-temporal-worker-python.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
 
-  ### SERVICES ###
+    ### SERVICES ###
 
-  api:
-    container_name: api
-    image: ghcr.io/togethercrew/api:main
-    restart: unless-stopped
-    env_file:
-      - ./.env.api
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-      redis-api:
-        condition: service_healthy
-    volumes:
-      - ./github/githubapp.private-key.pem:/project/githubapp.private-key.pem:ro
-    networks:
-      - production
-      - monitoring
-    <<: [*md-resources-common]
+    api:
+        container_name: api
+        image: ghcr.io/togethercrew/api:main
+        restart: unless-stopped
+        env_file:
+            - ./.env.api
+        depends_on:
+            mongodb:
+                condition: service_healthy
+            neo4j:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
+            redis-api:
+                condition: service_healthy
+        volumes:
+            - ./github/githubapp.private-key.pem:/project/githubapp.private-key.pem:ro
+        networks:
+            - production
+            - monitoring
+        <<: [*md-resources-common]
 
-  event-watcher:
-    container_name: event-watcher
-    image: ghcr.io/togethercrew/event-watcher:main
-    restart: unless-stopped
-    env_file:
-      - ./.env.event-watcher
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    <<: [*sm-resources-common]
+    event-watcher:
+        container_name: event-watcher
+        image: ghcr.io/togethercrew/event-watcher:main
+        restart: unless-stopped
+        env_file:
+            - ./.env.event-watcher
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        networks:
+            - production
+            - monitoring
+        <<: [*sm-resources-common]
 
-  discord-bot:
-    container_name: discord-bot
-    image: ghcr.io/togethercrew/discord-bot-bot:main
-    restart: unless-stopped
-    env_file:
-      - ./.env.discord-bot
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      redis-discord:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    <<: [*lg-resources-common]
+    discord-bot:
+        container_name: discord-bot
+        image: ghcr.io/togethercrew/discord-bot-bot:main
+        restart: unless-stopped
+        env_file:
+            - ./.env.discord-bot
+        depends_on:
+            mongodb:
+                condition: service_healthy
+            redis-discord:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
+        networks:
+            - production
+            - monitoring
+        <<: [*lg-resources-common]
 
-  discord-hivemind-adapter:
-    container_name: discord-hivemind-adapter
-    image: ghcr.io/togethercrew/discord-bot-hivemind-adapter:main
-    restart: unless-stopped
-    env_file:
-      - ./.env.discord-hivemind-adapter
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    <<: [*sm-resources-common]
+    discord-hivemind-adapter:
+        container_name: discord-hivemind-adapter
+        image: ghcr.io/togethercrew/discord-bot-hivemind-adapter:main
+        restart: unless-stopped
+        env_file:
+            - ./.env.discord-hivemind-adapter
+        depends_on:
+            mongodb:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
+        networks:
+            - production
+            - monitoring
+        <<: [*sm-resources-common]
 
-  oci-backend:
-    container_name: oci-backend
-    image: ghcr.io/togethercrew/oci-backend:main
-    restart: unless-stopped
-    env_file:
-      - ./.env.oci-backend
-    expose:
-      - 3030
-    networks:
-      - production
-      - monitoring
-    <<: [*sm-resources-common]
+    oci-backend:
+        container_name: oci-backend
+        image: ghcr.io/togethercrew/oci-backend:main
+        restart: unless-stopped
+        env_file:
+            - ./.env.oci-backend
+        expose:
+            - 3030
+        networks:
+            - production
+            - monitoring
+        <<: [*sm-resources-common]
 
-  # analyzer-server:
-  #   container_name: analyzer-server
-  #   image: ghcr.io/togethercrew/discord-analyzer:main
-  #   command: python3 server.py
-  #   restart: unless-stopped
-  #   env_file:
-  #     - ./.env.analyzer
-  #   depends_on:
-  #     redis-analyzer:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
-  #   networks:
-  #     - production
-  #     - monitoring
-  #   <<: [ *sm-resources-common ]
+    # analyzer-server:
+    #   container_name: analyzer-server
+    #   image: ghcr.io/togethercrew/discord-analyzer:main
+    #   command: python3 server.py
+    #   restart: unless-stopped
+    #   env_file:
+    #     - ./.env.analyzer
+    #   depends_on:
+    #     redis-analyzer:
+    #       condition: service_healthy
+    #     rabbitmq:
+    #       condition: service_healthy
+    #   networks:
+    #     - production
+    #     - monitoring
+    #   <<: [ *sm-resources-common ]
 
-  # analyzer-worker:
-  #   container_name: analyzer-worker
-  #   image: ghcr.io/togethercrew/discord-analyzer:main
-  #   command: python3 worker.py
-  #   restart: unless-stopped
-  #   env_file:
-  #     - ./.env.analyzer
-  #   depends_on:
-  #     mongodb:
-  #       condition: service_healthy
-  #     redis-analyzer:
-  #       condition: service_healthy
-  #     neo4j:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
-  #   networks:
-  #     - production
-  #     - monitoring
-  #   <<: [ *xl-resources-common ]
+    # analyzer-worker:
+    #   container_name: analyzer-worker
+    #   image: ghcr.io/togethercrew/discord-analyzer:main
+    #   command: python3 worker.py
+    #   restart: unless-stopped
+    #   env_file:
+    #     - ./.env.analyzer
+    #   depends_on:
+    #     mongodb:
+    #       condition: service_healthy
+    #     redis-analyzer:
+    #       condition: service_healthy
+    #     neo4j:
+    #       condition: service_healthy
+    #     rabbitmq:
+    #       condition: service_healthy
+    #   networks:
+    #     - production
+    #     - monitoring
+    #   <<: [ *xl-resources-common ]
 
-  # discourse-extractor:
-  #   <<: [*discourse-common]
-  #   container_name: discourse-extractor
-  #   command: ["node", "dist/apps/extractor/main"]
+    # discourse-extractor:
+    #   <<: [*discourse-common]
+    #   container_name: discourse-extractor
+    #   command: ["node", "dist/apps/extractor/main"]
 
-  # discourse-graph:
-  #   <<: [*discourse-common]
-  #   container_name: discourse-graph
-  #   command: ["node", "dist/apps/graph/main"]
+    # discourse-graph:
+    #   <<: [*discourse-common]
+    #   container_name: discourse-graph
+    #   command: ["node", "dist/apps/graph/main"]
 
-  # discourse-mongo:
-  #   <<: [*discourse-common]
-  #   container_name: discourse-mongo
-  #   command: ["node", "dist/apps/mongo/main"]
+    # discourse-mongo:
+    #   <<: [*discourse-common]
+    #   container_name: discourse-mongo
+    #   command: ["node", "dist/apps/mongo/main"]
 
-  ### TEMPORAL ###
+    ### TEMPORAL ###
 
-  temporal:
-    container_name: temporal
-    image: temporalio/auto-setup:1.25.2
-    depends_on:
-      - temporal-postgresql
-      - temporal-elasticsearch
-    env_file: .env.temporal
-    networks:
-      - production
-      - monitoring
-    healthcheck:
-      test: ["CMD", "tctl", "--address", "temporal:7233", "workflow", "list"]
-      interval: 1s
-      timeout: 5s
-      retries: 30
-    <<: [*md-resources-common]
+    temporal:
+        container_name: temporal
+        image: temporalio/auto-setup:1.25.2
+        depends_on:
+            - temporal-postgresql
+            - temporal-elasticsearch
+        env_file: .env.temporal
+        networks:
+            - production
+            - monitoring
+        healthcheck:
+            test:
+                [
+                    'CMD',
+                    'tctl',
+                    '--address',
+                    'temporal:7233',
+                    'workflow',
+                    'list',
+                ]
+            interval: 1s
+            timeout: 5s
+            retries: 30
+        <<: [*md-resources-common]
 
-  temporal-ui:
-    container_name: temporal-ui
-    image: temporalio/ui:2.32.0
-    env_file: .env.temporal-ui
-    depends_on:
-      - temporal
-    networks:
-      - production
-      - monitoring
-    <<: [*sm-resources-common]
+    temporal-ui:
+        container_name: temporal-ui
+        image: temporalio/ui:2.32.0
+        env_file: .env.temporal-ui
+        depends_on:
+            - temporal
+        networks:
+            - production
+            - monitoring
+        <<: [*sm-resources-common]
 
-  temporal-elasticsearch:
-    container_name: temporal-elasticsearch
-    image: elasticsearch:8.16.0
-    environment:
-      - cluster.routing.allocation.disk.threshold_enabled=true
-      - cluster.routing.allocation.disk.watermark.low=512mb
-      - cluster.routing.allocation.disk.watermark.high=256mb
-      - cluster.routing.allocation.disk.watermark.flood_stage=128mb
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms256m -Xmx256m
-      - xpack.security.enabled=false
-    volumes:
-      - temporal_elasticsearch_data:/var/lib/elasticsearch/data
-    networks:
-      - production
-      - monitoring
-    <<: [*md-resources-common]
+    temporal-elasticsearch:
+        container_name: temporal-elasticsearch
+        image: elasticsearch:8.16.0
+        environment:
+            - cluster.routing.allocation.disk.threshold_enabled=true
+            - cluster.routing.allocation.disk.watermark.low=512mb
+            - cluster.routing.allocation.disk.watermark.high=256mb
+            - cluster.routing.allocation.disk.watermark.flood_stage=128mb
+            - discovery.type=single-node
+            - ES_JAVA_OPTS=-Xms256m -Xmx256m
+            - xpack.security.enabled=false
+        volumes:
+            - temporal_elasticsearch_data:/var/lib/elasticsearch/data
+        networks:
+            - production
+            - monitoring
+        <<: [*md-resources-common]
 
-  temporal-postgresql:
-    container_name: temporal-postgresql
-    image: postgres:12.22
-    env_file: .env.temporal-postgresql
-    networks:
-      - production
-      - monitoring
-    volumes:
-      - temporal_postgresql_data:/var/lib/postgresql/data
-    <<: [*md-resources-common]
+    temporal-postgresql:
+        container_name: temporal-postgresql
+        image: postgres:12.22
+        env_file: .env.temporal-postgresql
+        networks:
+            - production
+            - monitoring
+        volumes:
+            - temporal_postgresql_data:/var/lib/postgresql/data
+        <<: [*md-resources-common]
 
-  temporal-worker-typescript-heavy:
-    <<: [*temporal-worker-typescript]
-    environment:
-      - QUEUE=TEMPORAL_QUEUE_HEAVY
+    temporal-worker-typescript-heavy:
+        <<: [*temporal-worker-typescript]
+        environment:
+            - QUEUE=TEMPORAL_QUEUE_HEAVY
 
-  temporal-worker-typescript-light:
-    <<: [*temporal-worker-typescript]
-    environment:
-      - QUEUE=TEMPORAL_QUEUE_LIGHT
+    temporal-worker-typescript-light:
+        <<: [*temporal-worker-typescript]
+        environment:
+            - QUEUE=TEMPORAL_QUEUE_LIGHT
 
-  temporal-worker-python-heavy:
-    <<: [*temporal-worker-python]
-    environment:
-      - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
+    temporal-worker-python-heavy:
+        <<: [*temporal-worker-python]
+        environment:
+            - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
 
-  temporal-worker-python-light:
-    <<: [*temporal-worker-python]
-    environment:
-      - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_LIGHT
+    temporal-worker-python-light:
+        <<: [*temporal-worker-python]
+        environment:
+            - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_LIGHT
 
-  ### AIRFLOW ###
+    ### AIRFLOW ###
 
-  airflow-webserver:
-    container_name: airflow-webserver
-    <<: [*airflow-common, *lg-resources-common]
-    command: webserver
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+    airflow-webserver:
+        container_name: airflow-webserver
+        <<: [*airflow-common, *lg-resources-common]
+        command: webserver
+        healthcheck:
+            test: ['CMD', 'curl', '--fail', 'http://localhost:8080/health']
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        depends_on:
+            <<: *airflow-common-depends-on
+            airflow-init:
+                condition: service_completed_successfully
 
-  airflow-scheduler:
-    container_name: airflow-scheduler
-    <<: [*airflow-common, *lg-resources-common]
-    command: scheduler
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+    airflow-scheduler:
+        container_name: airflow-scheduler
+        <<: [*airflow-common, *lg-resources-common]
+        command: scheduler
+        healthcheck:
+            test: ['CMD', 'curl', '--fail', 'http://localhost:8974/health']
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        depends_on:
+            <<: *airflow-common-depends-on
+            airflow-init:
+                condition: service_completed_successfully
 
-  airflow-worker:
-    container_name: airflow-worker
-    <<: [*airflow-common, *xl-resources-common]
-    command: celery worker
-    healthcheck:
-      # yamllint disable rule:line-length
-      test:
-        - "CMD-SHELL"
-        - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    environment:
-      # Required to handle warm shutdown of the celery workers properly
-      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
-      DUMB_INIT_SETSID: "0"
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+    airflow-worker:
+        container_name: airflow-worker
+        <<: [*airflow-common, *xl-resources-common]
+        command: celery worker
+        healthcheck:
+            # yamllint disable rule:line-length
+            test:
+                - 'CMD-SHELL'
+                - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        environment:
+            # Required to handle warm shutdown of the celery workers properly
+            # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+            DUMB_INIT_SETSID: '0'
+        depends_on:
+            <<: *airflow-common-depends-on
+            airflow-init:
+                condition: service_completed_successfully
 
-  airflow-triggerer:
-    container_name: airflow-triggerer
-    <<: [*airflow-common, *lg-resources-common]
-    command: triggerer
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"',
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+    airflow-triggerer:
+        container_name: airflow-triggerer
+        <<: [*airflow-common, *lg-resources-common]
+        command: triggerer
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"',
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        depends_on:
+            <<: *airflow-common-depends-on
+            airflow-init:
+                condition: service_completed_successfully
 
-  airflow-init:
-    container_name: airflow-init
-    restart: "no"
-    <<: [*airflow-common, *lg-resources-common]
-    entrypoint: /bin/bash
-    command: -c "./init.sh"
-    env_file:
-      - ./.env.airflow
-      - ./.env.airflow.init
-    user: "0:0"
-    volumes:
-      - airflow_sources:/sources
+    airflow-init:
+        container_name: airflow-init
+        restart: 'no'
+        <<: [*airflow-common, *lg-resources-common]
+        entrypoint: /bin/bash
+        command: -c "./init.sh"
+        env_file:
+            - ./.env.airflow
+            - ./.env.airflow.init
+        user: '0:0'
+        volumes:
+            - airflow_sources:/sources
 
-  airflow-cli:
-    container_name: airflow-cli
-    restart: "no"
-    <<: [*airflow-common, *xl-resources-common]
-    profiles:
-      - debug
-    environment:
-      CONNECTION_CHECK_MAX_COUNT: "0"
-    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
-    command: bash -c airflow
+    airflow-cli:
+        container_name: airflow-cli
+        restart: 'no'
+        <<: [*airflow-common, *xl-resources-common]
+        profiles:
+            - debug
+        environment:
+            CONNECTION_CHECK_MAX_COUNT: '0'
+        # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+        command: bash -c airflow
 
-  # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
-  # or by explicitly targeted on the command line e.g. docker-compose up flower.
-  # See: https://docs.docker.com/compose/profiles/
-  flower:
-    container_name: flower
-    <<: [*airflow-common, *lg-resources-common]
-    command: celery flower
-    profiles:
-      - flower
-    ports:
-      - "5555:5555"
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: unless-stopped
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+    # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
+    # or by explicitly targeted on the command line e.g. docker-compose up flower.
+    # See: https://docs.docker.com/compose/profiles/
+    flower:
+        container_name: flower
+        <<: [*airflow-common, *lg-resources-common]
+        command: celery flower
+        profiles:
+            - flower
+        ports:
+            - '5555:5555'
+        healthcheck:
+            test: ['CMD', 'curl', '--fail', 'http://localhost:5555/']
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 30s
+        restart: unless-stopped
+        depends_on:
+            <<: *airflow-common-depends-on
+            airflow-init:
+                condition: service_completed_successfully
 
-  hivemind-server:
-    container_name: hivemind-server
-    <<: [*hivemind-common, *sm-resources-common]
-    command: fastapi run
+    hivemind-server:
+        container_name: hivemind-server
+        <<: [*hivemind-common, *sm-resources-common]
+        command: fastapi run
 
-  hivemind-worker:
-    # container_name: hivemind-worker
-    <<: [*hivemind-common, *xl-resources-common]
-    deploy:
-      mode: replicated
-      replicas: 3
+    hivemind-worker:
+        # container_name: hivemind-worker
+        <<: [*hivemind-common, *xl-resources-common]
+        deploy:
+            mode: replicated
+            replicas: 3
 
-    ### TELEGRAM
+    hivemind-temporal:
+        container_name: hivemind-temporal
+        <<: [*hivemind-common, *xl-resources-common]
+        depends_on:
+            temporal:
+                condition: service_healthy
+        command: python temporal/temporal_worker.py
 
-  telegram-bot:
-    <<: [*telegram-common]
-    container_name: telegram-bot
-    # command: ["node", "dist/apps/bot/main"]
+        ### TELEGRAM
 
-  question-service:
-    image: ghcr.io/togethercrew/question-service:main
-    container_name: question-service
-    # command: ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
-    platform: linux/x86_64
-    <<: [*sm-resources-common]
-    networks:
-      - production
-      - monitoring
+    telegram-bot:
+        <<: [*telegram-common]
+        container_name: telegram-bot
+        # command: ["node", "dist/apps/bot/main"]
 
-  ### ADMIN
+    question-service:
+        image: ghcr.io/togethercrew/question-service:main
+        container_name: question-service
+        # command: ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
+        platform: linux/x86_64
+        <<: [*sm-resources-common]
+        networks:
+            - production
+            - monitoring
 
-  admin-panel:
-    container_name: admin-panel
-    image: ghcr.io/togethercrew/admin-panel:main
-    restart: always
-    env_file:
-      - .env.admin-panel
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-    networks:
-      - production
-      - monitoring
-    <<: [*md-resources-common]
+    ### ADMIN
 
-  ### MONITORING
+    admin-panel:
+        container_name: admin-panel
+        image: ghcr.io/togethercrew/admin-panel:main
+        restart: always
+        env_file:
+            - .env.admin-panel
+        depends_on:
+            mongodb:
+                condition: service_healthy
+            neo4j:
+                condition: service_healthy
+        networks:
+            - production
+            - monitoring
+        <<: [*md-resources-common]
 
-  grafana:
-    container_name: grafana
-    image: grafana/grafana:10.3.3
-    restart: unless-stopped
-    volumes:
-      - ./grafana/provisioning/:/etc/grafana/provisioning
-      - grafana_volume:/var/lib/grafana
-    depends_on:
-      - prometheus
-      - loki
-    networks:
-      - monitoring
-    <<: [*sm-resources-common]
+    ### MONITORING
 
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus:v2.49.1
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    restart: unless-stopped
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus_volume:/prometheus
-    depends_on:
-      - cadvisor
-      - node-exporter
-    networks:
-      - monitoring
-    <<: [*sm-resources-common]
+    grafana:
+        container_name: grafana
+        image: grafana/grafana:10.3.3
+        restart: unless-stopped
+        volumes:
+            - ./grafana/provisioning/:/etc/grafana/provisioning
+            - grafana_volume:/var/lib/grafana
+        depends_on:
+            - prometheus
+            - loki
+        networks:
+            - monitoring
+        <<: [*sm-resources-common]
 
-  cadvisor:
-    container_name: cadvisor
-    image: gcr.io/cadvisor/cadvisor:v0.47.2
-    restart: unless-stopped
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    depends_on:
-      - redis-cadvisor
-    networks:
-      - monitoring
-    <<: [*sm-resources-common]
+    prometheus:
+        container_name: prometheus
+        image: prom/prometheus:v2.49.1
+        command:
+            - --config.file=/etc/prometheus/prometheus.yml
+        restart: unless-stopped
+        volumes:
+            - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+            - prometheus_volume:/prometheus
+        depends_on:
+            - cadvisor
+            - node-exporter
+        networks:
+            - monitoring
+        <<: [*sm-resources-common]
 
-  loki:
-    container_name: loki
-    image: grafana/loki:2.8.0
-    restart: unless-stopped
-    ports:
-      - 3100
-    volumes:
-      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
-      - loki_volume:/data/loki
-    command: -config.file=/etc/loki/loki-config.yaml
-    networks:
-      monitoring:
-        ipv4_address: 172.22.0.15
-    mem_limit: 1G
-    memswap_limit: 2G
+    cadvisor:
+        container_name: cadvisor
+        image: gcr.io/cadvisor/cadvisor:v0.47.2
+        restart: unless-stopped
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        depends_on:
+            - redis-cadvisor
+        networks:
+            - monitoring
+        <<: [*sm-resources-common]
 
-  node-exporter:
-    container_name: node-exporter
-    image: prom/node-exporter:v1.7.0
-    restart: unless-stopped
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - "--path.procfs=/host/proc"
-      - "--path.rootfs=/rootfs"
-      - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
-    networks:
-      - monitoring
-    <<: [*sm-resources-common]
+    loki:
+        container_name: loki
+        image: grafana/loki:2.8.0
+        restart: unless-stopped
+        ports:
+            - 3100
+        volumes:
+            - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
+            - loki_volume:/data/loki
+        command: -config.file=/etc/loki/loki-config.yaml
+        networks:
+            monitoring:
+                ipv4_address: 172.22.0.15
+        mem_limit: 1G
+        memswap_limit: 2G
 
-  otel-collector:
-    container_name: otel-collector
-    image: otel/opentelemetry-collector:0.92.0
-    command: ["--config=/etc/otel-collector.yaml"]
-    restart: unless-stopped
-    volumes:
-      - ./otel-collector/otel-collector.yaml:/etc/otel-collector.yaml
-    networks:
-      - monitoring
-      - production
-    <<: [*sm-resources-common]
+    node-exporter:
+        container_name: node-exporter
+        image: prom/node-exporter:v1.7.0
+        restart: unless-stopped
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - '--path.procfs=/host/proc'
+            - '--path.rootfs=/rootfs'
+            - '--path.sysfs=/host/sys'
+            - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+        networks:
+            - monitoring
+        <<: [*sm-resources-common]
 
-  tempo:
-    container_name: tempo
-    image: grafana/tempo:2.3.1
-    command: ["-config.file=/etc/tempo.yaml"]
-    restart: unless-stopped
-    volumes:
-      - ./tempo/tempo.yaml:/etc/tempo.yaml
-      - tempo_data:/tmp/tempo
-    networks:
-      - monitoring
-      - production
-    <<: [*sm-resources-common]
+    otel-collector:
+        container_name: otel-collector
+        image: otel/opentelemetry-collector:0.92.0
+        command: ['--config=/etc/otel-collector.yaml']
+        restart: unless-stopped
+        volumes:
+            - ./otel-collector/otel-collector.yaml:/etc/otel-collector.yaml
+        networks:
+            - monitoring
+            - production
+        <<: [*sm-resources-common]
 
-  pyroscope:
-    container_name: pyroscope
-    image: grafana/pyroscope:1.4.0
-    restart: unless-stopped
-    networks:
-      - monitoring
-      - production
-    <<: [*sm-resources-common]
-  ### SERVICE MANAGEMENT ###
+    tempo:
+        container_name: tempo
+        image: grafana/tempo:2.3.1
+        command: ['-config.file=/etc/tempo.yaml']
+        restart: unless-stopped
+        volumes:
+            - ./tempo/tempo.yaml:/etc/tempo.yaml
+            - tempo_data:/tmp/tempo
+        networks:
+            - monitoring
+            - production
+        <<: [*sm-resources-common]
 
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower:1.7.1
-    command: --interval 60 --http-api-metrics --http-api-token demotoken -d
-    restart: unless-stopped
-    env_file:
-      - ./.env.watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - monitoring
-    <<: [*sm-resources-common]
+    pyroscope:
+        container_name: pyroscope
+        image: grafana/pyroscope:1.4.0
+        restart: unless-stopped
+        networks:
+            - monitoring
+            - production
+        <<: [*sm-resources-common]
+    ### SERVICE MANAGEMENT ###
+
+    watchtower:
+        container_name: watchtower
+        image: containrrr/watchtower:1.7.1
+        command: --interval 60 --http-api-metrics --http-api-token demotoken -d
+        restart: unless-stopped
+        env_file:
+            - ./.env.watchtower
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - monitoring
+        <<: [*sm-resources-common]
 
 volumes:
-  mongodb_data_container:
-  rmq_data_container:
-  neo4j_data:
-  neo4j_import:
-  neo4j_plugins:
-  grafana_volume:
-  prometheus_volume:
-  loki_volume:
-  pgvector_data:
-  airflow_config:
-  airflow_logs:
-  airflow_plugins:
-  airflow_sources:
-  tempo_data:
-  qdrant_data:
-  qdrant_snapshots:
-  temporal_postgresql_data:
-  temporal_elasticsearch_data:
+    mongodb_data_container:
+    rmq_data_container:
+    neo4j_data:
+    neo4j_import:
+    neo4j_plugins:
+    grafana_volume:
+    prometheus_volume:
+    loki_volume:
+    pgvector_data:
+    airflow_config:
+    airflow_logs:
+    airflow_plugins:
+    airflow_sources:
+    tempo_data:
+    qdrant_data:
+    qdrant_snapshots:
+    temporal_postgresql_data:
+    temporal_elasticsearch_data:
 
 networks:
-  production:
-    driver: bridge
-  hivemind:
-    driver: bridge
-  discourse:
-    driver: bridge
-  monitoring:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.22.0.0/16
+    production:
+        driver: bridge
+    hivemind:
+        driver: bridge
+    discourse:
+        driver: bridge
+    monitoring:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.22.0.0/16
