@@ -738,7 +738,7 @@ services:
         depends_on:
             temporal:
                 condition: service_healthy
-        command: python temporal/worker.py
+        command: python temporal_worker.py
 
         ### TELEGRAM
 
