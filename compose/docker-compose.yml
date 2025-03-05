@@ -600,6 +600,24 @@ services:
         environment:
             - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_LIGHT
 
+    temporal-worker-agent:
+        docker pull ghcr.io/togethercrew/agents-workflow:main
+        restart: unless-stopped
+        env_file: .env.temporal-worker-agent
+        environment:
+            - TEMPORAL_TASK_QUEUE=HIVEMIND_AGENT_QUEUE
+            - TEMPORAL_HIVEMIND_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
+        depends_on:
+            temporal:
+                condition: service_healthy
+        networks:
+            - production
+            - monitoring
+        deploy:
+            mode: replicated
+            replicas: 3
+        <<: [*lg-resources-common]
+
     ### AIRFLOW ###
 
     airflow-webserver:
