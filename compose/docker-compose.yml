@@ -601,7 +601,7 @@ services:
             - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_LIGHT
 
     temporal-worker-agent:
-        docker pull ghcr.io/togethercrew/agents-workflow:main
+        image: ghcr.io/togethercrew/agents-workflow:main
         restart: unless-stopped
         env_file: .env.temporal-worker-agent
         environment:
