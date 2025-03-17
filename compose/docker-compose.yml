@@ -751,7 +751,7 @@ services:
             replicas: 3
 
     hivemind-temporal:
-        container_name: hivemind-temporal
+        # container_name: hivemind-temporal
         <<: [*hivemind-common, *xl-resources-common]
         depends_on:
             temporal:
