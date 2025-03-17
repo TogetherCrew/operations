@@ -757,6 +757,9 @@ services:
             temporal:
                 condition: service_healthy
         command: python temporal_worker.py
+        deploy:
+            mode: replicated
+            replicas: 3
 
         ### TELEGRAM
 
