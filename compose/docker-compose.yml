@@ -606,7 +606,7 @@ services:
         env_file: .env.temporal-worker-agent
         environment:
             - TEMPORAL_TASK_QUEUE=HIVEMIND_AGENT_QUEUE
-            - TEMPORAL_HIVEMIND_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
+            - TEMPORAL_HIVEMIND_TASK_QUEUE=TEMPORAL_HIVEMIND_WORKER_QUEUE
         depends_on:
             temporal:
                 condition: service_healthy
