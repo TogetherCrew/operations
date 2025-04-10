@@ -375,6 +375,12 @@ services:
             - ./redis/redis-temporal-worker-python.conf:/usr/local/etc/redis/redis.conf:ro
         <<: [*redis]
 
+    redis-temporal-worker-agent:
+        container_name: redis-temporal-worker-agent
+        volumes:
+            - ./redis/redis-temporal-worker-agent.conf:/usr/local/etc/redis/redis.conf:ro
+        <<: [*redis]
+
     ### SERVICES ###
 
     api:
@@ -613,6 +619,8 @@ services:
             - TEMPORAL_HIVEMIND_TASK_QUEUE=TEMPORAL_HIVEMIND_WORKER_QUEUE
         depends_on:
             temporal:
+                condition: service_healthy
+            redis-temporal-worker-agent:
                 condition: service_healthy
         networks:
             - production
