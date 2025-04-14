@@ -604,6 +604,8 @@ services:
         <<: [*temporal-worker-python]
         environment:
             - TEMPORAL_TASK_QUEUE=TEMPORAL_QUEUE_PYTHON_HEAVY
+        volumes:
+            - mediawiki_dumps:/project/dumps
 
     temporal-worker-python-light:
         <<: [*temporal-worker-python]
@@ -955,6 +957,7 @@ volumes:
     qdrant_snapshots:
     temporal_postgresql_data:
     temporal_elasticsearch_data:
+    mediawiki_dumps:
 
 networks:
     production:
