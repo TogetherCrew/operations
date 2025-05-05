@@ -88,6 +88,10 @@ def run_migration():
                         collection_name=old_name
                     )
 
+                    if new_name in collection_names:
+                        logger.info(f"Collection {new_name} already exists - skipping the process.")
+                        continue
+
                     # Create the new collection with the same parameters
                     qdrant_client.create_collection(
                         collection_name=new_name,
