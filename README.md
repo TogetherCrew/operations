@@ -83,6 +83,37 @@ echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
 - Create a `config.ini` file based on the `config.ini.example`
 - run the command `mongodb-migrate` within the directory you are in
 
+## Running Qdrant migrations
+
+The Qdrant V001 migration scripts handle tasks like renaming collections or transferring data between collections.
+
+### Running the collection rename migration
+
+This migration renames Qdrant collections from `[communityId]_[platformName]` format to `[communityId]_[platformId]` format.
+
+1. Install the required dependencies:
+
+   ```bash
+   cd db/qdrant
+   pip install -r requirements.txt
+   ```
+
+2. Set up environment variables by creating a `.env` file based on `.env.example` file
+
+3. Run the migration script:
+
+   ```bash
+   cd db/qdrant
+   python V001_collection_names.py
+   ```
+
+The script will:
+
+- Identify collections that match the pattern `[communityId]_[platformName]`
+- Look up the corresponding platformId in MongoDB
+- Create new collections with names in the format `[communityId]_[platformId]`
+- Transfer all data from the old collections to the new ones
+
 ## Creating a .htpasswd file
 
 ```bash
