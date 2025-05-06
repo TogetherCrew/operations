@@ -22,7 +22,18 @@ def run_migration():
     # Connect to Qdrant
     qdrant_host = os.getenv("QDRANT_HOST", "localhost")
     qdrant_port = int(os.getenv("QDRANT_PORT", "6333"))
-    qdrant_client = QdrantClient(host=qdrant_host, port=qdrant_port)
+    qdrant_api_key = os.getenv("QDRANT_API_KEY")
+    qdrant_https = os.getenv("QDRANT_USE_HTTPS", False)
+    # Get batch size from environment variable or use a smaller default (32 instead of 128)
+    batch_size = int(os.getenv("QDRANT_MIGRATION_BATCH_SIZE", "32"))
+
+    # Connect to Qdrant
+    qdrant_client = QdrantClient(
+        host=qdrant_host,
+        port=qdrant_port,
+        https=qdrant_https,
+        api_key=qdrant_api_key,
+    )
 
     # Connect to MongoDB
     mongo_uri = os.getenv("MONGODB_URI")
@@ -103,8 +114,8 @@ def run_migration():
                     )
 
                     # Get all data from the old collection in batches
-                    batch_size = 128
-
+                    # Using a smaller batch size to prevent "413 Payload Too Large" errors
+                    
                     # scroll returns (records, next_offset)
                     next_offset = None
 
@@ -127,11 +138,29 @@ def run_migration():
                             for rec in records
                         ]
 
-                        qdrant_client.upsert(
-                            collection_name=new_name,
-                            points=points,
-                            wait=True,
-                        )
+                        try:
+                            qdrant_client.upsert(
+                                collection_name=new_name,
+                                points=points,
+                                wait=True,
+                            )
+                        except Exception as upsert_error:
+                            if "413" in str(upsert_error):
+                                # If we hit a payload too large error, try with a smaller batch
+                                logger.warning(f"Payload too large with batch size {len(points)}, attempting with smaller batches")
+                                # Split the batch in half and retry each half
+                                mid = len(points) // 2
+                                for sub_batch in [points[:mid], points[mid:]]:
+                                    if sub_batch:
+                                        qdrant_client.upsert(
+                                            collection_name=new_name,
+                                            points=sub_batch,
+                                            wait=True,
+                                        )
+                                logger.info(f"Successfully inserted with smaller sub-batches")
+                            else:
+                                # Re-raise other errors
+                                raise upsert_error
 
                         # no more pages
                         if next_offset is None:
