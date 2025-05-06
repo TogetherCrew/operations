@@ -1,0 +1,4 @@
+pymongo==4.12.1
+qdrant-client==1.14.2
+tqdm==4.67.0
+python-dotenv>=1.0.0, <2.0.0

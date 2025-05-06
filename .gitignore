@@ -11,3 +11,6 @@ db/mongo/config.ini
 
 *.key
 *.pem
+
+.venv/*
+.venv
