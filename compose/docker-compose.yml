@@ -421,8 +421,7 @@ services:
 
     discord-bot:
         container_name: discord-bot
-        # image: ghcr.io/togethercrew/discord-bot-bot:main
-        image: ghcr.io/togethercrew/discord-bot-bot@sha256:5e5b313e2b572bb0e09de509091a02f67f48caa7f8622251c16514a77fc55bdb
+        image: ghcr.io/togethercrew/discord-bot-bot:main
         restart: unless-stopped
         env_file:
             - ./.env.discord-bot
