@@ -25,7 +25,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-load_dotenv("dags/.env")
+load_dotenv()
 
 class DiscordPGToQdrantMigrator:
     def __init__(self, dry_run: bool = False):
@@ -129,7 +129,8 @@ class DiscordPGToQdrantMigrator:
                 # Set up Qdrant ingestion pipeline
                 ingestion_pipeline = CustomIngestionPipeline(
                     community_id=community_id,
-                    collection_name=platform_id
+                    collection_name=platform_id,
+                    use_cache=False,
                 )
                 
                 # Migrate in batches of 50
@@ -225,7 +226,8 @@ class DiscordPGToQdrantMigrator:
                 # Set up Qdrant ingestion pipeline for summaries
                 ingestion_pipeline = CustomIngestionPipeline(
                     community_id=community_id,
-                    collection_name=f"{platform_id}_summary"
+                    collection_name=f"{platform_id}_summary",
+                    use_cache=False,
                 )
                 
                 # Migrate in batches of 50
