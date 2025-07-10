@@ -85,9 +85,9 @@ echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
 
 ## Running Qdrant migrations
 
-The Qdrant V001 migration scripts handle tasks like renaming collections or transferring data between collections.
+Qdrant migration scripts handle various data migration tasks including renaming collections and transferring data between different storage systems.
 
-### Running the collection rename migration
+### V001: Collection rename migration
 
 This migration renames Qdrant collections from `[communityId]_[platformName]` format to `[communityId]_[platformId]` format.
 
@@ -95,10 +95,10 @@ This migration renames Qdrant collections from `[communityId]_[platformName]` fo
 
    ```bash
    cd db/qdrant
-   pip install -r requirements.txt
+   pip install -r v001_requirements.txt
    ```
 
-2. Set up environment variables by creating a `.env` file based on `.env.example` file
+2. Set up environment variables by creating a `.env` file based on `.env.v001.example` file
 
 3. Run the migration script:
 
@@ -114,10 +114,39 @@ The script will:
 - Create new collections with names in the format `[communityId]_[platformId]`
 - Transfer all data from the old collections to the new ones
 
+### V002: Discord PostgreSQL to Qdrant migration
+
+This migration moves Discord data from PostgreSQL vector storage to Qdrant vector storage, including both regular Discord messages and Discord summaries.
+
+1. Install the required dependencies:
+
+   ```bash
+   cd db/qdrant
+   pip install -r v002_requirements.txt
+   ```
+
+2. Set up environment variables by creating a `.env` file based on `.env.v002.example` file
+
+3. Run the migration script:
+
+   ```bash
+   cd db/qdrant
+   python V002_migrate_discord_pgvector.py --community-id COMMUNITY_ID --platform-id PLATFORM_ID
+   ```
+
+   Optional flags:
+   - `--dry-run`: Run in dry-run mode to preview the migration without actually transferring data
+
+The script will:
+
+- Connect to the PostgreSQL database for the specified community
+- Retrieve Discord messages and summaries with their embeddings
+- Transfer all data to Qdrant collections using the specified platform ID
+- Create separate collections for regular messages and summaries (`platform_id` and `platform_id_summary`)
+
 ## Creating a .htpasswd file
 
 ```bash
 cd /nginx/htpasswd/
 htpasswd -c .htpasswd username
 ```
-

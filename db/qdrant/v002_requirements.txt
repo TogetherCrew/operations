@@ -1,0 +1,6 @@
+psycopg2-binary>=2.9.0
+llama-index-core>=0.10.0
+tc-hivemind-backend>=1.4.0
+python-dotenv>=1.0.0
+pymongo==4.13.2
+motor==3.7.1
