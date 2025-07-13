@@ -3,10 +3,10 @@
 Migration script to move Discord data from PostgreSQL to Qdrant.
 
 This script migrates both regular Discord messages and Discord summaries
-from PostgreSQL vector storage to Qdrant vector storage.
+from PostgreSQL vector storage to Qdrant vector storage for all Discord platforms.
 
 Usage:
-    python migrate_discord_pg_to_qdrant.py --community-id COMMUNITY_ID --platform-id PLATFORM_ID [--dry-run]
+    python V002_migrate_discord_pgvector.py [--dry-run]
 """
 
 import argparse
@@ -16,6 +16,7 @@ import sys
 from llama_index.core import Document
 from tc_hivemind_backend.db.postgresql import PostgresSingleton
 from tc_hivemind_backend.ingest_qdrant import CustomIngestionPipeline
+from tc_hivemind_backend.db.mongo import MongoSingleton
 from dotenv import load_dotenv
 
 # Configure logging
@@ -32,6 +33,37 @@ class DiscordPGToQdrantMigrator:
         self.dry_run = dry_run
         self.processed_documents = 0
         self.processed_summaries = 0
+
+    def get_discord_platforms(self):
+        """Get all Discord platforms from MongoDB."""
+        try:
+            mongo_instance = MongoSingleton.get_instance()
+            db = mongo_instance.get_client()["Core"]
+            platforms_collection = db["platforms"]
+            
+            # Query for all Discord platforms
+            discord_platforms = platforms_collection.find(
+                {
+                    "name": "discord",
+                    "disconnectedAt": None,
+                }
+            )
+            
+            platforms = []
+            for platform in discord_platforms:
+                community_id = str(platform["community"])
+                platform_id = str(platform["_id"])
+                platforms.append({
+                    "community_id": community_id,
+                    "platform_id": platform_id
+                })
+            
+            logger.info(f"Found {len(platforms)} Discord platforms")
+            return platforms
+            
+        except Exception as e:
+            logger.error(f"Error getting Discord platforms from MongoDB: {e}")
+            return []
 
     def get_discord_document_count(self, dbname: str) -> int:
         """Get count of Discord documents from a community database."""
@@ -246,64 +278,72 @@ class DiscordPGToQdrantMigrator:
             logger.error(f"Error migrating Discord summaries: {e}")
             return False
 
-    def run_migration(self, community_id: str, platform_id: str):
-        """Run the complete migration process for a specific community and platform."""
-        logger.info("Starting Discord PostgreSQL to Qdrant migration")
+    def run_migration(self):
+        """Run the complete migration process for all Discord platforms."""
+        logger.info("Starting Discord PostgreSQL to Qdrant migration for all platforms")
         
         if self.dry_run:
             logger.info("DRY RUN MODE - No data will be actually migrated")
         
-        dbname = f"community_{community_id}"
-        logger.info(f"Migrating community: {community_id}, platform: {platform_id}")
+        # Get all Discord platforms
+        platforms = self.get_discord_platforms()
         
-        # Check if community database has Discord data
-        doc_count = self.get_discord_document_count(dbname)
-        if doc_count == 0:
-            logger.info(f"No Discord documents found in community {community_id}")
+        if not platforms:
+            logger.info("No Discord platforms found")
             return True
         
-        success = True
+        overall_success = True
         
-        # Migrate Discord documents
-        if not self.migrate_discord_documents(dbname, platform_id):
-            success = False
-        
-        # Migrate Discord summaries
-        if not self.migrate_discord_summaries(dbname, platform_id):
-            success = False
+        for platform in platforms:
+            community_id = platform["community_id"]
+            platform_id = platform["platform_id"]
+            
+            logger.info(f"Processing community: {community_id}, platform: {platform_id}")
+            
+            dbname = f"community_{community_id}"
+            
+            # Check if community database has Discord data
+            doc_count = self.get_discord_document_count(dbname)
+            if doc_count == 0:
+                logger.info(f"No Discord documents found in community {community_id}")
+                continue
+            
+            success = True
+            
+            # Migrate Discord documents
+            if not self.migrate_discord_documents(dbname, platform_id):
+                success = False
+                overall_success = False
+            
+            # Migrate Discord summaries
+            if not self.migrate_discord_summaries(dbname, platform_id):
+                success = False
+                overall_success = False
+            
+            if success:
+                logger.info(f"Successfully migrated community {community_id}")
+            else:
+                logger.error(f"Failed to migrate community {community_id}")
         
         # Summary
         logger.info("=" * 60)
         logger.info("MIGRATION SUMMARY")
         logger.info("=" * 60)
-        logger.info(f"Community: {community_id}")
-        logger.info(f"Platform: {platform_id}")
-        logger.info(f"Documents migrated: {self.processed_documents}")
-        logger.info(f"Summaries migrated: {self.processed_summaries}")
+        logger.info(f"Total platforms processed: {len(platforms)}")
+        logger.info(f"Total documents migrated: {self.processed_documents}")
+        logger.info(f"Total summaries migrated: {self.processed_summaries}")
         
-        if success:
+        if overall_success:
             logger.info("Migration completed successfully!")
         else:
-            logger.error("Migration failed!")
+            logger.error("Migration failed for one or more platforms!")
         
-        return success
+        return overall_success
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Migrate Discord data from PostgreSQL to Qdrant"
-    )
-    parser.add_argument(
-        "--community-id",
-        type=str,
-        required=True,
-        help="Community ID to migrate"
-    )
-    parser.add_argument(
-        "--platform-id",
-        type=str,
-        required=True,
-        help="Platform ID for the Discord platform"
+        description="Migrate Discord data from PostgreSQL to Qdrant for all platforms"
     )
     parser.add_argument(
         "--dry-run",
@@ -316,7 +356,7 @@ def main():
     migrator = DiscordPGToQdrantMigrator(dry_run=args.dry_run)
     
     try:
-        success = migrator.run_migration(args.community_id, args.platform_id)
+        success = migrator.run_migration()
         sys.exit(0 if success else 1)
     except KeyboardInterrupt:
         logger.info("Migration interrupted by user")

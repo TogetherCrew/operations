@@ -116,7 +116,7 @@ The script will:
 
 ### V002: Discord PostgreSQL to Qdrant migration
 
-This migration moves Discord data from PostgreSQL vector storage to Qdrant vector storage, including both regular Discord messages and Discord summaries.
+This migration moves Discord data from PostgreSQL vector storage to Qdrant vector storage for all Discord platforms, including both regular Discord messages and Discord summaries.
 
 1. Install the required dependencies:
 
@@ -131,7 +131,7 @@ This migration moves Discord data from PostgreSQL vector storage to Qdrant vecto
 
    ```bash
    cd db/qdrant
-   python V002_migrate_discord_pgvector.py --community-id COMMUNITY_ID --platform-id PLATFORM_ID
+   python V002_migrate_discord_pgvector.py
    ```
 
    Optional flags:
@@ -139,9 +139,10 @@ This migration moves Discord data from PostgreSQL vector storage to Qdrant vecto
 
 The script will:
 
-- Connect to the PostgreSQL database for the specified community
+- Connect to MongoDB to fetch all Discord platforms from the `Core` database
+- For each Discord platform, connect to the corresponding PostgreSQL community database
 - Retrieve Discord messages and summaries with their embeddings
-- Transfer all data to Qdrant collections using the specified platform ID
+- Transfer all data to Qdrant collections using the platform ID
 - Create separate collections for regular messages and summaries (`platform_id` and `platform_id_summary`)
 
 ## Creating a .htpasswd file
