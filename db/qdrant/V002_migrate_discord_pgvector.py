@@ -12,6 +12,7 @@ Usage:
 import argparse
 import logging
 import sys
+from datetime import datetime
 
 from llama_index.core import Document
 from tc_hivemind_backend.db.postgresql import PostgresSingleton
@@ -33,6 +34,24 @@ class DiscordPGToQdrantMigrator:
         self.dry_run = dry_run
         self.processed_documents = 0
         self.processed_summaries = 0
+
+    def convert_date_to_timestamp(self, metadata):
+        """Convert date string in metadata to float timestamp."""
+        if metadata and isinstance(metadata, dict) and 'date' in metadata:
+            try:
+                date_str = metadata['date']
+                if isinstance(date_str, str):
+                    # Try parsing with time first (regular Discord documents)
+                    try:
+                        dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+                    except ValueError:
+                        # Try parsing date only (summaries)
+                        dt = datetime.strptime(date_str, '%Y-%m-%d')
+                    
+                    metadata['date'] = dt.timestamp()
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Could not parse date '{metadata.get('date', 'N/A')}': {e}")
+        return metadata
 
     def get_discord_platforms(self):
         """Get all Discord platforms from MongoDB."""
@@ -123,6 +142,9 @@ class DiscordPGToQdrantMigrator:
             documents = []
             for row in cursor.fetchall():
                 node_id, text, metadata, embedding = row
+
+                # Convert date in metadata to timestamp
+                metadata = self.convert_date_to_timestamp(metadata)
 
                 # Create Document object
                 doc = Document(
@@ -221,6 +243,9 @@ class DiscordPGToQdrantMigrator:
             for row in cursor.fetchall():
                 node_id, text, metadata, embedding = row
                 
+                # Convert date in metadata to timestamp
+                metadata = self.convert_date_to_timestamp(metadata)
+
                 # Create Document object
                 doc = Document(
                     text=text,
