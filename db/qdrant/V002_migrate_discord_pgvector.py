@@ -8,7 +8,7 @@ from PostgreSQL vector storage to Qdrant vector storage for all Discord platform
 Usage:
     python V002_migrate_discord_pgvector.py [--dry-run]
 """
-
+import asyncio
 import argparse
 import logging
 import sys
@@ -19,6 +19,34 @@ from tc_hivemind_backend.db.postgresql import PostgresSingleton
 from tc_hivemind_backend.ingest_qdrant import CustomIngestionPipeline
 from tc_hivemind_backend.db.mongo import MongoSingleton
 from dotenv import load_dotenv
+from tc_temporal_backend.client import TemporalClient
+from pydantic import BaseModel
+
+
+class BatchDocument(BaseModel):
+    """A model representing a document for batch ingestion.
+    
+    """
+    docId: str
+    text: str
+    metadata: dict
+    excludedEmbedMetadataKeys: list[str] = []
+    excludedLlmMetadataKeys: list[str] = []
+
+
+class BatchIngestionRequest(BaseModel):
+    """A model representing a batch of ingestion requests for document processing.
+
+    Parameters
+    ----------
+    ingestion_requests : list[IngestionRequest]
+        A list of ingestion requests.
+    """
+    communityId: str
+    platformId: str
+    collectionName: str | None = None
+    document: list[BatchDocument]
+
 
 # Configure logging
 logging.basicConfig(
@@ -139,7 +167,7 @@ class DiscordPGToQdrantMigrator:
                 ORDER BY (metadata_->>'date')::timestamp;
             """)
             
-            documents = []
+            documents: list[Document] = []
             for row in cursor.fetchall():
                 node_id, text, metadata, embedding = row
 
@@ -178,22 +206,43 @@ class DiscordPGToQdrantMigrator:
             postgres_instance.close_connection()
             
             logger.info(f"Retrieved {len(documents)} Discord documents")
-            
-            if not self.dry_run and documents:
-                # Set up Qdrant ingestion pipeline
-                ingestion_pipeline = CustomIngestionPipeline(
-                    community_id=community_id,
-                    collection_name=platform_id,
-                    use_cache=False,
-                )
-                
+
+            client = asyncio.run(TemporalClient().get_client())
+
+            batch_documents: list[BatchDocument] = []
+            if not self.dry_run and documents:                
                 # Migrate in batches of 50
                 batch_size = 50
                 for i in range(0, len(documents), batch_size):
                     batch = documents[i:i+batch_size]
                     logger.info(f"Processing Discord batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}")
-                    ingestion_pipeline.run_pipeline(docs=batch)
-                
+                    # batch_documents.extend(batch)
+                    batch_documents.extend(
+                        [
+                            BatchDocument(
+                                docId=doc.doc_id, 
+                                text=doc.text, 
+                                metadata=doc.metadata, 
+                                excludedEmbedMetadataKeys=doc.metadata.get("excludedEmbedMetadataKeys", []), 
+                                excludedLlmMetadataKeys=doc.metadata.get("excludedLlmMetadataKeys", [])
+                            ) for doc in batch
+                        ]
+                    )
+
+
+                payload = BatchIngestionRequest(
+                    communityId=community_id,
+                    platformId=platform_id,
+                    document=batch_documents,
+                )
+
+                asyncio.run(client.execute_workflow(
+                    "BatchVectorIngestionWorkflow",
+                    payload,
+                    id=f"migrations:IngestDiscord:{datetime.now().timestamp()}",
+                    task_queue="TEMPORAL_QUEUE_PYTHON_HEAVY",
+                ))
+
                 logger.info(f"Successfully migrated {len(documents)} Discord documents")
             
             self.processed_documents += len(documents)
