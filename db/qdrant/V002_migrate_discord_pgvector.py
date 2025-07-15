@@ -16,7 +16,6 @@ from datetime import datetime
 
 from llama_index.core import Document
 from tc_hivemind_backend.db.postgresql import PostgresSingleton
-from tc_hivemind_backend.ingest_qdrant import CustomIngestionPipeline
 from tc_hivemind_backend.db.mongo import MongoSingleton
 from dotenv import load_dotenv
 from tc_temporal_backend.client import TemporalClient
@@ -85,7 +84,16 @@ class DiscordPGToQdrantMigrator:
         """Get all Discord platforms from MongoDB."""
         try:
             mongo_instance = MongoSingleton.get_instance()
-            db = mongo_instance.get_client()["Core"]
+            if mongo_instance is None:
+                logger.error("Failed to get MongoDB instance")
+                return []
+            
+            client = mongo_instance.get_client()
+            if client is None:
+                logger.error("Failed to get MongoDB client")
+                return []
+                
+            db = client["Core"]
             platforms_collection = db["platforms"]
             
             # Query for all Discord platforms
@@ -177,9 +185,12 @@ class DiscordPGToQdrantMigrator:
                 # Create Document object
                 doc = Document(
                     text=text,
-                    doc_id=node_id,
-                    metadata=metadata
+                    doc_id=node_id
                 )
+                
+                # Set metadata separately
+                if metadata:
+                    doc.metadata = metadata
                 
                 # Add the embedding if it exists
                 if embedding is not None:
@@ -281,7 +292,7 @@ class DiscordPGToQdrantMigrator:
                 ORDER BY (metadata_->>'date')::timestamp;
             """)
             
-            documents = []
+            documents: list[Document] = []
             for row in cursor.fetchall():
                 node_id, text, metadata, embedding = row
                 
@@ -291,9 +302,12 @@ class DiscordPGToQdrantMigrator:
                 # Create Document object
                 doc = Document(
                     text=text,
-                    doc_id=node_id,
-                    metadata=metadata
+                    doc_id=node_id
                 )
+                
+                # Set metadata separately
+                if metadata:
+                    doc.metadata = metadata
                 
                 # Add the embedding if it exists
                 if embedding is not None:
@@ -320,22 +334,37 @@ class DiscordPGToQdrantMigrator:
             postgres_instance.close_connection()
             
             logger.info(f"Retrieved {len(documents)} Discord summary documents")
-            
-            if not self.dry_run and documents:
-                # Set up Qdrant ingestion pipeline for summaries
-                ingestion_pipeline = CustomIngestionPipeline(
-                    community_id=community_id,
-                    collection_name=f"{platform_id}_summary",
-                    use_cache=False,
+
+            client = asyncio.run(TemporalClient().get_client())
+
+            batch_documents: list[BatchDocument] = []
+            if not self.dry_run and documents:                
+                batch_documents.extend(
+                    [
+                        BatchDocument(
+                            docId=doc.doc_id, 
+                            text=doc.text, 
+                            metadata=doc.metadata, 
+                            excludedEmbedMetadataKeys=doc.metadata.get("excludedEmbedMetadataKeys", []), 
+                            excludedLlmMetadataKeys=doc.metadata.get("excludedLlmMetadataKeys", [])
+                        ) for doc in documents
+                    ]
                 )
-                
-                # Migrate in batches of 50
-                batch_size = 50
-                for i in range(0, len(documents), batch_size):
-                    batch = documents[i:i+batch_size]
-                    logger.info(f"Processing summary batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}")
-                    ingestion_pipeline.run_pipeline(docs=batch)
-                
+
+                payload = BatchIngestionRequest(
+                    communityId=community_id,
+                    platformId=platform_id,
+                    collectionName=f"{platform_id}_summary",
+                    document=batch_documents,
+                )
+
+                asyncio.run(client.execute_workflow(
+                    "BatchVectorIngestionWorkflow",
+                    payload,
+                    id=f"migrations:IngestDiscordSummary:{int(datetime.now().timestamp())}",
+                    task_queue="TEMPORAL_QUEUE_PYTHON_HEAVY",
+                ))
+
                 logger.info(f"Successfully migrated {len(documents)} Discord summary documents")
             
             self.processed_summaries += len(documents)
