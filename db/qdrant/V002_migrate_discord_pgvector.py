@@ -211,24 +211,17 @@ class DiscordPGToQdrantMigrator:
 
             batch_documents: list[BatchDocument] = []
             if not self.dry_run and documents:                
-                # Migrate in batches of 50
-                batch_size = 50
-                for i in range(0, len(documents), batch_size):
-                    batch = documents[i:i+batch_size]
-                    logger.info(f"Processing Discord batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}")
-                    # batch_documents.extend(batch)
-                    batch_documents.extend(
-                        [
-                            BatchDocument(
-                                docId=doc.doc_id, 
-                                text=doc.text, 
-                                metadata=doc.metadata, 
-                                excludedEmbedMetadataKeys=doc.metadata.get("excludedEmbedMetadataKeys", []), 
-                                excludedLlmMetadataKeys=doc.metadata.get("excludedLlmMetadataKeys", [])
-                            ) for doc in batch
-                        ]
-                    )
-
+                batch_documents.extend(
+                    [
+                        BatchDocument(
+                            docId=doc.doc_id, 
+                            text=doc.text, 
+                            metadata=doc.metadata, 
+                            excludedEmbedMetadataKeys=doc.metadata.get("excludedEmbedMetadataKeys", []), 
+                            excludedLlmMetadataKeys=doc.metadata.get("excludedLlmMetadataKeys", [])
+                        ) for doc in documents
+                    ]
+                )
 
                 payload = BatchIngestionRequest(
                     communityId=community_id,
@@ -239,7 +232,7 @@ class DiscordPGToQdrantMigrator:
                 asyncio.run(client.execute_workflow(
                     "BatchVectorIngestionWorkflow",
                     payload,
-                    id=f"migrations:IngestDiscord:{datetime.now().timestamp()}",
+                    id=f"migrations:IngestDiscord:{int(datetime.now().timestamp())}",
                     task_queue="TEMPORAL_QUEUE_PYTHON_HEAVY",
                 ))
 
