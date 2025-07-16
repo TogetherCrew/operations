@@ -20,13 +20,29 @@ This directory contains the Docker setup for migrating Discord data from Postgre
 
 2. Make sure you have the required environment variables set in your `.env` file:
    ```env
-   POSTGRES_HOST=pgvector
-   POSTGRES_USER=your_postgres_user
-   POSTGRES_PASSWORD=your_postgres_password
-   MONGO_INITDB_ROOT_USERNAME=your_mongo_user
-   MONGO_INITDB_ROOT_PASSWORD=your_mongo_password
-   QDRANT_HOST=qdrant
-   TEMPORAL_HOST=temporal
+    POSTGRES_HOST=
+    POSTGRES_PASS=
+    POSTGRES_USER=
+    POSTGRES_PORT=
+    POSTGRES_DBNAME=
+
+    QDRANT_HOST=
+    QDRANT_PORT=
+    QDRANT_API_KEY=
+    QDRANT_USE_HTTPS=
+
+    MONGODB_HOST=
+    MONGODB_USER=
+    MONGODB_PASS=
+    MONGODB_PORT=
+
+    COHERE_API_KEY=
+    CHUNK_SIZE=
+    EMBEDDING_DIM=
+
+    TEMPORAL_HOST=
+    TEMPORAL_API_KEY=
+    TEMPORAL_PORT=
    ```
 
 ## Usage
@@ -36,7 +52,7 @@ This directory contains the Docker setup for migrating Discord data from Postgre
 From the project root directory:
 
 ```bash
-docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml build discord-migration
+docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml build discord-migration
 ```
 
 ### 2. Run a Dry Run (Recommended)
@@ -44,7 +60,7 @@ docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-
 Test the migration without actually moving data:
 
 ```bash
-docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run
+docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run
 ```
 
 ### 3. Run the Actual Migration
@@ -52,7 +68,7 @@ docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-
 Once you're satisfied with the dry run results:
 
 ```bash
-docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration
+docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration
 ```
 
 ### 4. Verify the Migration (Optional)
@@ -60,7 +76,7 @@ docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-
 Run the verification script to check that data was migrated correctly:
 
 ```bash
-docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration python V002_verify_migration.py
+docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration python V002_verify_migration.py
 ```
 
 ## What the Migration Does

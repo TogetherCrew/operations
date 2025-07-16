@@ -5,7 +5,7 @@
 
 set -e
 
-COMPOSE_FILES="-f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml"
+COMPOSE_FILES="-f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml"
 SERVICE_NAME="discord-migration"
 
 # Colors for output
@@ -168,8 +168,8 @@ main() {
 }
 
 # Check if we're in the correct directory
-if [[ ! -f "docker-compose.yml" ]]; then
-    print_error "Please run this script from the project root directory (where docker-compose.yml is located)"
+if [[ ! -f "compose/docker-compose.yml" ]]; then
+    print_error "Please run this script from the project root directory (where compose/docker-compose.yml is located)"
     exit 1
 fi
 

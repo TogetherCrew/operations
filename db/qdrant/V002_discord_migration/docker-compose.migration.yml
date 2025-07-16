@@ -3,13 +3,13 @@
 #
 # Usage:
 #   # Run a dry-run first
-#   docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run
+#   docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run
 #   
 #   # Run the actual migration
-#   docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration
+#   docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration
 #
 #   # Run verification after migration
-#   docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration python V002_verify_migration.py
+#   docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration python V002_verify_migration.py
 
 version: '3.8'
 
@@ -19,7 +19,7 @@ services:
       context: ./db/qdrant/V002_discord_migration
       dockerfile: Dockerfile
     environment:
-      # PostgreSQL connection (adjust these based on your main docker-compose.yml)
+      # PostgreSQL connection (matching existing services)
       - POSTGRES_HOST=${POSTGRES_HOST:-pgvector}
       - POSTGRES_PORT=${POSTGRES_PORT:-5432}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -36,7 +36,6 @@ services:
       - QDRANT_HOST=${QDRANT_HOST:-qdrant}
       - QDRANT_PORT=${QDRANT_PORT:-6333}
       - QDRANT_API_KEY=${QDRANT_API_KEY}
-      - QDRANT_USE_HTTPS=${QDRANT_USE_HTTPS:-False}
       
       # Temporal connection
       - TEMPORAL_HOST=${TEMPORAL_HOST:-temporal}
@@ -53,12 +52,12 @@ services:
       - qdrant
       - temporal
     networks:
-      - tc-network
+      - production
     profiles:
       - migration
     # Remove the container after it exits
     restart: "no"
 
 networks:
-  tc-network:
+  production:
     external: true 
