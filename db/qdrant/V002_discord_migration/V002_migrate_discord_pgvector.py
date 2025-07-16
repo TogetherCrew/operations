@@ -10,6 +10,7 @@ Usage:
 """
 import asyncio
 import argparse
+import ast
 import logging
 import sys
 from datetime import datetime
@@ -198,7 +199,6 @@ class DiscordPGToQdrantMigrator:
                         # Convert embedding from PostgreSQL format to list
                         if isinstance(embedding, str):
                             # If it's a string representation, parse it
-                            import ast
                             embedding_vector = ast.literal_eval(embedding)
                         elif hasattr(embedding, 'tolist'):
                             # If it's a numpy array or similar, convert to list
@@ -315,7 +315,6 @@ class DiscordPGToQdrantMigrator:
                         # Convert embedding from PostgreSQL format to list
                         if isinstance(embedding, str):
                             # If it's a string representation, parse it
-                            import ast
                             embedding_vector = ast.literal_eval(embedding)
                         elif hasattr(embedding, 'tolist'):
                             # If it's a numpy array or similar, convert to list
