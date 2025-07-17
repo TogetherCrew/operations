@@ -52,7 +52,7 @@ This directory contains the Docker setup for migrating Discord data from Postgre
 From the project root directory:
 
 ```bash
-docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml build discord-migration
+docker compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml build discord-migration
 ```
 
 ### 2. Run a Dry Run (Recommended)
@@ -60,7 +60,7 @@ docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration
 Test the migration without actually moving data:
 
 ```bash
-docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run
+docker compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run
 ```
 
 ### 3. Run the Actual Migration
@@ -68,7 +68,7 @@ docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration
 Once you're satisfied with the dry run results:
 
 ```bash
-docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration
+docker compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration
 ```
 
 ### 4. Verify the Migration (Optional)
@@ -76,7 +76,7 @@ docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration
 Run the verification script to check that data was migrated correctly:
 
 ```bash
-docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration python V002_verify_migration.py
+docker compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration python V002_verify_migration.py
 ```
 
 ## What the Migration Does
@@ -116,7 +116,7 @@ docker-compose run --rm discord-migration ping temporal
 
 ```bash
 # Run with verbose logging
-docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run 2>&1 | tee migration.log
+docker compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run 2>&1 | tee migration.log
 ```
 
 ## Important Notes
@@ -126,4 +126,4 @@ docker-compose -f docker-compose.yml -f db/qdrant/V002_discord_migration/docker-
 - The migration uses Temporal workflows for reliability and can be monitored through the Temporal UI
 - Each Discord platform gets its own collection in Qdrant
 - Summary documents are stored in separate collections with the suffix `_summary`
-- The migration preserves all existing metadata and embeddings 
+- The migration preserves all existing metadata and embeddings
