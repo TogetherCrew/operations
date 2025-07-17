@@ -52,7 +52,7 @@ This directory contains the Docker setup for migrating Discord data from Postgre
 From the project root directory:
 
 ```bash
-docker compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml build discord-migration
+docker compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml build --no-cache discord-migration
 ```
 
 ### 2. Run a Dry Run (Recommended)

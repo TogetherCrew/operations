@@ -31,8 +31,8 @@ COPY V002_verify_migration.py .
 # Change ownership to non-root user
 RUN chown -R migration-user:migration-user /app
 
-# Switch to non-root user
-USER migration-user
+# # Switch to non-root user
+# USER migration-user
 
 # Set environment variables for better Python behavior in containers
 ENV PYTHONUNBUFFERED=1
