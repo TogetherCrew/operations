@@ -1,0 +1,7 @@
+psycopg2-binary==2.9.10
+tc-hivemind-backend==1.4.4.post1
+python-dotenv==1.1.1
+pymongo==4.13.2
+motor==3.7.1
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+tc-temporal-backend==1.1.4

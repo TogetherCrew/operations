@@ -1,0 +1,63 @@
+# Discord Migration Service
+# This file can be used with docker-compose to run the Discord PostgreSQL to Qdrant migration
+#
+# Usage:
+#   # Run a dry-run first
+#   docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration --dry-run
+#   
+#   # Run the actual migration
+#   docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration
+#
+#   # Run verification after migration
+#   docker-compose -f compose/docker-compose.yml -f db/qdrant/V002_discord_migration/docker-compose.migration.yml run --rm discord-migration python V002_verify_migration.py
+
+version: '3.8'
+
+services:
+  discord-migration:
+    build:
+      context: ./db/qdrant/V002_discord_migration
+      dockerfile: Dockerfile
+    environment:
+      # PostgreSQL connection (matching existing services)
+      - POSTGRES_HOST=${POSTGRES_HOST:-pgvector}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+      - POSTGRES_DBNAME=${POSTGRES_DBNAME:-postgres}
+      
+      # MongoDB connection
+      - MONGODB_HOST=${MONGODB_HOST:-mongodb}
+      - MONGODB_PORT=${MONGODB_PORT:-27017}
+      - MONGODB_USER=${MONGODB_USER}
+      - MONGODB_PASS=${MONGODB_PASS}
+      
+      # Qdrant connection
+      - QDRANT_HOST=${QDRANT_HOST:-qdrant}
+      - QDRANT_PORT=${QDRANT_PORT:-6333}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      
+      # Temporal connection
+      - TEMPORAL_HOST=${TEMPORAL_HOST:-temporal}
+      - TEMPORAL_PORT=${TEMPORAL_PORT:-7233}
+      - TEMPORAL_API_KEY=${TEMPORAL_API_KEY}
+      
+      # Additional environment variables that might be needed
+      - PYTHONPATH=/app
+      - TZ=UTC
+      
+    depends_on:
+      - mongodb
+      - pgvector
+      - qdrant
+      - temporal
+    networks:
+      - production
+    profiles:
+      - migration
+    # Remove the container after it exits
+    restart: "no"
+
+networks:
+  production:
+    external: true 
