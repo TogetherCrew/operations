@@ -14,6 +14,7 @@ import ast
 import logging
 import sys
 from datetime import datetime
+import os
 
 from llama_index.core import Document
 from tc_hivemind_backend.db.postgresql import PostgresSingleton
@@ -219,6 +220,10 @@ class DiscordPGToQdrantMigrator:
             logger.info(f"Retrieved {len(documents)} Discord documents")
 
             logger.info("Starting Temporal client")
+            logger.info(f"TEMPORAL_HOST: {os.getenv('TEMPORAL_HOST')}")
+            logger.info(f"TEMPORAL_PORT: {os.getenv('TEMPORAL_PORT')}")
+            logger.info(f"TEMPORAL_API_KEY: {os.getenv('TEMPORAL_API_KEY')}")
+
             client = asyncio.run(TemporalClient().get_client())
 
             logger.info("Starting to prepare batch documents!")
