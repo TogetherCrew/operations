@@ -218,8 +218,10 @@ class DiscordPGToQdrantMigrator:
             
             logger.info(f"Retrieved {len(documents)} Discord documents")
 
+            logger.info("Starting Temporal client")
             client = asyncio.run(TemporalClient().get_client())
 
+            logger.info("Starting to prepare batch documents!")
             batch_documents: list[BatchDocument] = []
             if not self.dry_run and documents:                
                 batch_documents.extend(
@@ -234,12 +236,14 @@ class DiscordPGToQdrantMigrator:
                     ]
                 )
 
+                logger.info("Starting to prepare temporal payloads!")
                 payload = BatchIngestionRequest(
                     communityId=community_id,
                     platformId=platform_id,
                     document=batch_documents,
                 )
 
+                logger.info("Starting to execute temporal workflow!")
                 asyncio.run(client.execute_workflow(
                     "BatchVectorIngestionWorkflow",
                     payload,
