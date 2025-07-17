@@ -21,6 +21,9 @@ COPY v002_requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r v002_requirements.txt
 
+# Download NLTK data as root before switching to non-root user
+RUN python -c "import nltk; nltk.download('punkt')"
+
 # Copy migration scripts
 COPY V002_migrate_discord_pgvector.py .
 COPY V002_verify_migration.py .
