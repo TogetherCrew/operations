@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose -f docker-compose.test.yml up --exit-code-from app
-      - uses: paambaati/codeclimate-action@v5.4.3
+      - uses: paambaati/codeclimate-action@v6.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
 #       - uses: actions/configure-pages@v3
