@@ -1,9 +1,6 @@
 # Same as test.yml, but removed the usage of CodeClimate
 on: 
   workflow_call:
-    secrets:
-      CC_TEST_REPORTER_ID:
-        required: true
   
 jobs:
   test:
