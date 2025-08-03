@@ -1,0 +1,17 @@
+# removed the usage of CodeClimate
+on: 
+  workflow_call:
+    secrets:
+      CC_TEST_REPORTER_ID:
+        required: true
+
+jobs:
+    lint:
+      uses: ./.github/workflows/lint.yml
+    test:
+      uses: ./.github/workflows/test2.yml
+      secrets:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+    build-push:
+      needs: [lint, test]
+      uses: ./.github/workflows/build-push.yml
