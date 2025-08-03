@@ -1,7 +1,9 @@
 # removed the usage of CodeClimate
 on: 
   workflow_call:
-
+    secrets:
+      CC_TEST_REPORTER_ID:
+        required: true
 jobs:
     lint:
       uses: ./.github/workflows/lint.yml
