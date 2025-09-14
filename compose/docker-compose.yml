@@ -302,7 +302,7 @@ services:
         networks:
             - production
             - monitoring
-        <<: [*lg-resources-common]
+        <<: [*xl-resources-common]
 
     qdrant-healthcheck:
         container_name: qdrant-healthcheck
