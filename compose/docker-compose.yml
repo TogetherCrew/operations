@@ -1,10 +1,13 @@
 x-logging: &logging
     logging:
-        driver: loki
+        driver: json-file # loki
         options:
-            loki-url: http://172.22.0.15:3100/loki/api/v1/push
-            loki-retries: 5
-            loki-batch-size: 400
+            max-size: "10m"
+            max-file: "3"
+        # options:
+        #     loki-url: http://172.22.0.15:3100/loki/api/v1/push
+        #     loki-retries: 5
+        #     loki-batch-size: 400
 
 x-sm-resources-common: &sm-resources-common
     mem_limit: 1G
