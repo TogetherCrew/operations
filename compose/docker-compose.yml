@@ -548,6 +548,7 @@ services:
             interval: 1s
             timeout: 5s
             retries: 30
+            start_period: 60s
         <<: [*md-resources-common]
 
     temporal-ui:
