@@ -529,8 +529,10 @@ services:
         image: temporalio/auto-setup:1.26.3.0
         restart: unless-stopped
         depends_on:
-            - temporal-postgresql
-            - temporal-elasticsearch
+            temporal-postgresql:
+                condition: service_healthy
+            temporal-elasticsearch:
+                condition: service_healthy
         env_file: .env.temporal
         networks:
             - production
