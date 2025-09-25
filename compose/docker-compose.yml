@@ -545,10 +545,10 @@ services:
                     'workflow',
                     'list',
                 ]
-            interval: 1s
+            interval: 10s      # Changed from 1s
             timeout: 5s
-            retries: 30
-            start_period: 60s
+            retries: 5         # Changed from 30
+            start_period: 90s  # Increased from 60s
         <<: [*md-resources-common]
 
     temporal-ui:
